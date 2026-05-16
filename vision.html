@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>J.A.R.V.E.S. — Módulo Visão</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#C9A84C;--gold-light:#E8C97A;--gold-dim:#7a6330;--black:#080808;--surface:#0f0f0f;--surface2:#181818;--surface3:#222222;--text:#e8e0d0;--text-dim:#7a7060;--red:#c0392b;--green:#27ae60;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--black);color:var(--text);font-family:'Cormorant Garamond',serif;min-height:100vh;}
+.jarves-header{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;border-bottom:1px solid #1e1e1e;background:var(--surface);}
+.jarves-logo{font-family:'Space Mono',monospace;font-size:13px;letter-spacing:4px;color:var(--gold);text-transform:uppercase;}
+.jarves-logo span{color:var(--text-dim);font-size:10px;display:block;letter-spacing:2px;margin-top:2px;}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);display:inline-block;margin-right:8px;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 4px var(--green);}50%{box-shadow:0 0 14px var(--green);}}
+.status-label{font-family:'Space Mono',monospace;font-size:10px;color:var(--green);letter-spacing:2px;}
+.tabs{display:flex;border-bottom:1px solid #1e1e1e;background:var(--surface);overflow-x:auto;}
+.tabs a{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;padding:14px 20px;color:var(--text-dim);text-decoration:none;text-transform:uppercase;border-bottom:2px solid transparent;white-space:nowrap;}
+.tabs a.active{color:var(--gold);border-bottom-color:var(--gold);}
+.vision-layout{display:grid;grid-template-columns:1fr 1fr;min-height:calc(100vh - 120px);}
+@media(max-width:768px){.vision-layout{grid-template-columns:1fr;}}
+.panel-input{padding:32px 28px;border-right:1px solid #1e1e1e;display:flex;flex-direction:column;gap:24px;}
+.panel-output{padding:32px 28px;display:flex;flex-direction:column;gap:20px;background:var(--surface);}
+.panel-title{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--text-dim);text-transform:uppercase;padding-bottom:12px;border-bottom:1px solid #1e1e1e;}
+.drop-zone{border:1px dashed var(--gold-dim);border-radius:4px;min-height:220px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;background:var(--surface2);}
+.drop-zone:hover{border-color:var(--gold);background:#1a1714;}
+.drop-zone input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.drop-icon{font-size:28px;opacity:0.4;}
+.drop-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--gold-dim);}
+.drop-sub{font-size:12px;color:var(--text-dim);font-style:italic;}
+.preview-img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;}
+.preview-overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.85));padding:12px;display:flex;justify-content:space-between;align-items:flex-end;}
+.preview-filename{font-family:'Space Mono',monospace;font-size:9px;color:var(--gold-light);}
+.btn-clear{font-family:'Space Mono',monospace;font-size:8px;background:transparent;border:1px solid var(--red);color:var(--red);padding:4px 8px;cursor:pointer;}
+.key-section{display:flex;flex-direction:column;gap:8px;}
+.key-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--text-dim);}
+.key-input{background:var(--surface2);border:1px solid #2a2a2a;color:var(--text);font-family:'Space Mono',monospace;font-size:11px;padding:10px 14px;width:100%;border-radius:2px;}
+.key-input:focus{outline:none;border-color:var(--gold-dim);}
+.tom-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.btn-tone{background:var(--surface2);border:1px solid #2a2a2a;color:var(--text-dim);padding:10px;cursor:pointer;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;transition:all 0.2s;border-radius:2px;}
+.btn-tone.selected{background:#1a1600;border-color:var(--gold);color:var(--gold);}
+.btn-gerar{width:100%;padding:14px;background:transparent;border:1px solid var(--gold);color:var(--gold);font-family:'Space Mono',monospace;font-size:11px;letter-spacing:4px;text-transform:uppercase;cursor:pointer;transition:all 0.3s;}
+.btn-gerar:disabled{opacity:0.3;cursor:not-allowed;}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;min-height:200px;opacity:0.3;}
+.empty-state.hidden{display:none;}
+.loading-state{display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px;min-height:200px;}
+.loading-state.active{display:flex;}
+.loading-ring{width:40px;height:40px;border:1px solid #2a2a2a;border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-text{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--gold-dim);}
+.output-blocks{display:none;flex-direction:column;gap:16px;}
+.output-blocks.active{display:flex;}
+.output-block{background:var(--surface2);border:1px solid #222;border-radius:2px;}
+.block-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #2a2a2a;background:var(--surface3);}
+.block-tag{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:3px;color:var(--gold-dim);}
+.block-channel{font-family:'Space Mono',monospace;font-size:8px;color:var(--text-dim);}
+.block-body{padding:16px;font-size:14px;line-height:1.7;color:var(--text);white-space:pre-wrap;}
+.block-footer{display:flex;align-items:center;justify-content:flex-end;padding:8px 14px;border-top:1px solid #1e1e1e;gap:8px;}
+.btn-copy{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:2px;background:transparent;border:1px solid #333;color:var(--text-dim);padding:6px 12px;cursor:pointer;}
+.btn-copy.copied{border-color:var(--green);color:var(--green);}
+.etiqueta-card{background:#0a0a00;border:1px solid var(--gold-dim);border-radius:2px;padding:14px 16px;display:none;gap:16px;flex-wrap:wrap;}
+.etiqueta-card.active{display:flex;}
+.etiqueta-item{display:flex;flex-direction:column;gap:4px;}
+.etiqueta-item-label{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--gold-dim);}
+.etiqueta-item-value{font-family:'Space Mono',monospace;font-size:14px;color:var(--gold-light);}
+.barbara-player{display:none;background:#0a0a05;border:1px solid var(--gold-dim);border-radius:2px;padding:16px;align-items:center;gap:12px;}
+.barbara-player.active{display:flex;}
+.barbara-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--gold-dim),var(--gold));display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.barbara-name{font-family:'Space Mono',monospace;font-size:10px;color:var(--gold);letter-spacing:2px;}
+.barbara-status{font-family:'Space Mono',monospace;font-size:8px;color:var(--text-dim);letter-spacing:1px;margin-top:2px;}
+.btn-play{background:var(--gold);border:none;color:var(--black);width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;}
+.btn-whatsapp{display:none;width:100%;padding:14px;background:#075e54;border:none;color:white;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;border-radius:2px;text-align:center;text-decoration:none;}
+.btn-whatsapp.active{display:block;}
+.error-msg{display:none;background:#1a0000;border:1px solid var(--red);padding:12px;border-radius:2px;font-family:'Space Mono',monospace;font-size:10px;color:var(--red);}
+.error-msg.active{display:block;}
+</style>
+</head>
+<body>
+<header class="jarves-header">
+<div class="jarves-logo">J.A.R.V.E.S.<span>Segunda Pele — Visão + Bárbara Mercedes</span></div>
+<div><span class="status-dot"></span><span class="status-label">GROQ + ELEVENLABS</span></div>
+</header>
+<nav class="tabs">
+<a href="index.html">ASSISTENTE</a>
+<a href="index.html#vendas">SCRIPTS DE VENDA</a>
+<a href="index.html#fluxo">FLUXO J.A.R.V.E.S.</a>
+<a href="vision.html" class="active">VISÃO ◈</a>
+</nav>
+<div class="vision-layout">
+<div class="panel-input">
+<div class="panel-title">// 01 · ENTRADA</div>
+<div class="drop-zone" id="dropZone">
+<input type="file" id="fileInput" accept="image/*">
+<div class="drop-icon">◈</div>
+<div class="drop-label">FOTO DA JOIA</div>
+<div class="drop-sub">Foto bruta — sistema lê a etiqueta</div>
+</div>
+<div class="key-section">
+<label class="key-label">// GROQ API KEY</label>
+<input type="password" class="key-input" id="groqKey" placeholder="gsk_...">
+</div>
+<div class="key-section">
+<label class="key-label">// ELEVENLABS API KEY</label>
+<input type="password" class="key-input" id="elevenKey" placeholder="sk_...">
+</div>
+<div>
+<div class="key-label" style="margin-bottom:10px;">// TOM PSICOLÓGICO</div>
+<div class="tom-grid">
+<button class="btn-tone selected" data-tone="silenciosa">◈ Presença</button>
+<button class="btn-tone" data-tone="escassez">◈ Escassez</button>
+<button class="btn-tone" data-tone="identidade">◈ Identidade</button>
+<button class="btn-tone" data-tone="poder">◈ Poder</button>
+</div>
+</div>
+<button class="btn-gerar" id="btnGerar" disabled>▸ GERAR + BÁRBARA NARRA</button>
+</div>
+<div class="panel-output">
+<div class="panel-title">// 02 · ARSENAL + VOZ</div>
+<div class="empty-state" id="emptyState"><div style="font-size:32px;opacity:0.4;">◎</div><div style="font-size:14px;font-style:italic;color:var(--text-dim);">Aguardando foto...</div></div>
+<div class="loading-state" id="loadingState"><div class="loading-ring"></div><div class="loading-text" id="loadingText">ANALISANDO...</div></div>
+<div class="error-msg" id="errorMsg"></div>
+<div class="etiqueta-card" id="etiquetaCard">
+<div class="etiqueta-item"><span class="etiqueta-item-label">Tipo</span><span class="etiqueta-item-value" id="tagTipo">—</span></div>
+<div class="etiqueta-item"><span class="etiqueta-item-label">Peso</span><span class="etiqueta-item-value" id="tagPeso">—</span></div>
+<div class="etiqueta-item"><span class="etiqueta-item-label">Tamanho</span><span class="etiqueta-item-value" id="tagTamanho">—</span></div>
+<div class="etiqueta-item"><span class="etiqueta-item-label">Material</span><span class="etiqueta-item-value">Ouro 18k</span></div>
+</div>
+<div class="barbara-player" id="barbaraPlayer">
+<div class="barbara-avatar">◈</div>
+<div style="flex:1;"><div class="barbara-name">BÁRBARA MERCEDES</div><div class="barbara-status" id="barbaraStatus">pronta para narrar</div></div>
+<button class="btn-play" id="btnPlay">▶</button>
+</div>
+<div class="output-blocks" id="outputBlocks">
+<div class="output-block"><div class="block-header"><span class="block-tag">◈ Bloco 01</span><span class="block-channel">STORY</span></div><div class="block-body" id="out-story">—</div><div class="block-footer"><button class="btn-copy" data-target="out-story">COPIAR</button></div></div>
+<div class="output-block"><div class="block-header"><span class="block-tag">◈ Bloco 02</span><span class="block-channel">WHATSAPP</span></div><div class="block-body" id="out-whatsapp">—</div><div class="block-footer"><button class="btn-copy" data-target="out-whatsapp">COPIAR</button></div></div>
+<div class="output-block"><div class="block-header"><span class="block-tag">◈ Bloco 03</span><span class="block-channel">FEED / REELS</span></div><div class="block-body" id="out-feed">—</div><div class="block-footer"><button class="btn-copy" data-target="out-feed">COPIAR</button></div></div>
+</div>
+<a class="btn-whatsapp" id="btnWhatsapp" href="#" target="_blank">▸ DISPARAR NO WHATSAPP</a>
+</div>
+</div>
+<script>
+let imageBase64=null,selectedTone='silenciosa',audioUrl=null;
+const TONS={silenciosa:'presença silenciosa e elegância atemporal.',escassez:'escassez real. 12 peças por mês, numeradas.',identidade:'identidade de grupo seleto.',poder:'poder pessoal e autoridade.'};
+const groqKey=document.getElementById('groqKey'),elevenKey=document.getElementById('elevenKey'),btnGerar=document.getElementById('btnGerar'),emptyState=document.getElementById('emptyState'),loadingState=document.getElementById('loadingState'),outputBlocks=document.getElementById('outputBlocks'),etiquetaCard=document.getElementById('etiquetaCard'),errorMsg=document.getElementById('errorMsg'),btnWhatsapp=document.getElementById('btnWhatsapp'),barbaraPlayer=document.getElementById('barbaraPlayer'),loadingText=document.getElementById('loadingText'),barbaraStatus=document.getElementById('barbaraStatus'),btnPlay=document.getElementById('btnPlay');
+const sg=localStorage.getItem('jarves_groq'),se=localStorage.getItem('jarves_eleven');
+if(sg)groqKey.value=sg;if(se)elevenKey.value=se;
+groqKey.addEventListener('change',()=>localStorage.setItem('jarves_groq',groqKey.value.trim()));
+elevenKey.addEventListener('change',()=>localStorage.setItem('jarves_eleven',elevenKey.value.trim()));
+function checkReady(){btnGerar.disabled=!(imageBase64&&groqKey.value.trim());}
+groqKey.addEventListener('input',checkReady);
+elevenKey.addEventListener('input',checkReady);
+document.getElementById('dropZone').addEventListener('dragover',e=>{e.preventDefault();});
+document.getElementById('dropZone').addEventListener('drop',e=>{e.preventDefault();const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/'))loadImage(f);});
+document.getElementById('fileInput').addEventListener('change',e=>{if(e.target.files[0])loadImage(e.target.files[0]);});
+function loadImage(file){const r=new FileReader();r.onload=e=>{imageBase64=e.target.result.split(',')[1];document.getElementById('dropZone').innerHTML=`<img class="preview-img" src="${e.target.result}"><div class="preview-overlay"><span class="preview-filename">${file.name}</span><button class="btn-clear" id="btnClear">✕</button></div>`;document.getElementById('btnClear').addEventListener('click',ev=>{ev.stopPropagation();imageBase64=null;document.getElementById('dropZone').innerHTML='<input type="file" id="fileInput" accept="image/*"><div class="drop-icon">◈</div><div class="drop-label">FOTO DA JOIA</div><div class="drop-sub">Foto bruta — sistema lê a etiqueta</div>';document.getElementById('fileInput').addEventListener('change',e=>{if(e.target.files[0])loadImage(e.target.files[0]);});checkReady();});checkReady();};r.readAsDataURL(file);}
+document.querySelectorAll('.btn-tone').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.btn-tone').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');selectedTone=btn.dataset.tone;}));
+btnPlay.addEventListener('click',()=>{if(audioUrl){const a=new Audio(audioUrl);a.play();barbaraStatus.textContent='narrando...';a.onended=()=>barbaraStatus.textContent='narração completa';}});
+btnGerar.addEventListener('click',async()=>{
+emptyState.classList.add('hidden');outputBlocks.classList.remove('active');etiquetaCard.classList.remove('active');btnWhatsapp.classList.remove('active');errorMsg.classList.remove('active');barbaraPlayer.classList.remove('active');loadingState.classList.add('active');loadingText.textContent='ANALISANDO ETIQUETA...';btnGerar.disabled=true;
+const prompt=`Você é J.A.R.V.E.S., sistema premium da Segunda Pele — joias ouro 18k, 17 anos, 12 peças numeradas/mês. Tom: ${TONS[selectedTone]} REGRAS: nunca desconto; RESERVA nos stories; preço só WhatsApp. Responda APENAS JSON:\n{"etiqueta":{"tipo":"tipo da peça","peso":"peso ou null","tamanho":"tamanho ou null"},"story":"copy story com RESERVA","whatsapp":"script fechamento WhatsApp","feed":"descrição técnica elegante","barbara":"3 frases sussurradas de luxo mencionando a peça e exclusividade"}`;
+try{
+const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${groqKey.value.trim()}`},body:JSON.stringify({model:'meta-llama/llama-4-scout-17b-16e-instruct',max_tokens:1500,messages:[{role:'user',content:[{type:'image_url',image_url:{url:`data:image/jpeg;base64,${imageBase64}`}},{type:'text',text:prompt}]}]})});
+if(!res.ok)throw new Error(`Groq erro ${res.status}`);
+const data=await res.json();
+let raw=(data.choices?.[0]?.message?.content||'').replace(/```json|```/g,'').trim();
+const p=JSON.parse(raw);
+document.getElementById('tagTipo').textContent=p.etiqueta?.tipo||'—';
+document.getElementById('tagPeso').textContent=p.etiqueta?.peso||'—';
+document.getElementById('tagTamanho').textContent=p.etiqueta?.tamanho||'—';
+etiquetaCard.classList.add('active');
+document.getElementById('out-story').textContent=p.story||'—';
+document.getElementById('out-whatsapp').textContent=p.whatsapp||'—';
+document.getElementById('out-feed').textContent=p.feed||'—';
+btnWhatsapp.href=`https://wa.me/?text=${encodeURIComponent(p.whatsapp||'')}`;
+btnWhatsapp.classList.add('active');
+outputBlocks.classList.add('active');
+if(elevenKey.value.trim()&&p.barbara){
+loadingText.textContent='BÁRBARA NARRANDO...';
+const vid=localStorage.getItem('barbara_voice_id')||'';
+if(vid){
+const tts=await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${vid}`,{method:'POST',headers:{'Content-Type':'application/json','xi-api-key':elevenKey.value.trim()},body:JSON.stringify({text:p.barbara,model_id:'eleven_multilingual_v2',voice_settings:{stability:0.75,similarity_boost:0.85,style:0.4,use_speaker_boost:true}})});
+if(tts.ok){const blob=await tts.blob();audioUrl=URL.createObjectURL(blob);barbaraPlayer.classList.add('active');barbaraStatus.textContent='toque para ouvir';}}}
+loadingState.classList.remove('active');
+}catch(err){loadingState.classList.remove('active');errorMsg.textContent=`⚠ ${err.message}`;errorMsg.classList.add('active');emptyState.classList.remove('hidden');}
+finally{btnGerar.disabled=false;}
+});
+document.addEventListener('click',e=>{if(!e.target.classList.contains('btn-copy'))return;const t=document.getElementById(e.target.dataset.target)?.textContent||'';navigator.clipboard.writeText(t).then(()=>{e.target.textContent='COPIADO ✓';e.target.classList.add('copied');setTimeout(()=>{e.target.textContent='COPIAR';e.target.classList.remove('copied');},2000);});});
+</script>
+</body>
+  </html>
