@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jarves · Segunda Pele Command Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,300;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #080A0C;
+  --bg2:       #0D1014;
+  --bg3:       #131820;
+  --ouro:      #C9A84C;
+  --ouro-v:    #E8C96A;
+  --ouro-s:    #7A6030;
+  --verde:     #1DB954;
+  --azul:      #4A90E2;
+  --vermelho:  #E25555;
+  --branco:    #EAE8E4;
+  --cinza:     #525A66;
+  --cinza-v:   #8A94A0;
+  --linha:     rgba(201,168,76,.08);
+  --glow:      rgba(201,168,76,.15);
+}
+
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);
+  color:var(--branco);
+  font-family:'Syne',sans-serif;
+  font-weight:300;
+  overflow-x:hidden;
+  min-height:100vh;
+}
+
+/* GRAIN */
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  opacity:.025;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* SCAN LINES */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.03) 2px,rgba(0,0,0,.03) 4px);
+}
+
+/* ── LAYOUT GRID ── */
+.app{
+  display:grid;
+  grid-template-columns:220px 1fr;
+  min-height:100vh;
+  position:relative;
+  z-index:1;
+}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  background:var(--bg2);
+  border-right:1px solid var(--linha);
+  display:flex;
+  flex-direction:column;
+  position:sticky;
+  top:0;
+  height:100vh;
+  overflow:hidden;
+}
+
+.sidebar-logo{
+  padding:28px 24px 24px;
+  border-bottom:1px solid var(--linha);
+}
+.logo-sys{
+  font-family:'Space Mono',monospace;
+  font-size:.65rem;
+  color:var(--ouro);
+  letter-spacing:.15em;
+  margin-bottom:4px;
+}
+.logo-name{
+  font-family:'Playfair Display',serif;
+  font-style:italic;
+  font-size:1.1rem;
+  font-weight:300;
+  color:var(--branco);
+}
+.logo-status{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin-top:8px;
+  font-family:'Space Mono',monospace;
+  font-size:.5rem;
+  color:var(--verde);
+}
+.dot-live{
+  width:5px;height:5px;border-radius:50%;background:var(--verde);
+  animation:pulseVerde 2s ease-in-out infinite;
+}
+
+.sidebar-nav{
+  flex:1;
+  padding:20px 0;
+  overflow-y:auto;
+}
+.nav-section{
+  padding:8px 20px 4px;
+  font-family:'Space Mono',monospace;
+  font-size:.42rem;
+  letter-spacing:.3em;
+  color:var(--cinza);
+  text-transform:uppercase;
+}
+.nav-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 20px;
+  font-size:.68rem;
+  color:var(--cinza-v);
+  cursor:pointer;
+  transition:all .2s;
+  border-left:2px solid transparent;
+  letter-spacing:.03em;
+}
+.nav-item:hover{color:var(--branco);background:rgba(255,255,255,.03);}
+.nav-item.ativo{color:var(--ouro);border-left-color:var(--ouro);background:rgba(201,168,76,.05);}
+.nav-icon{font-size:.8rem;width:16px;text-align:center;}
+
+.sidebar-footer{
+  padding:16px 20px;
+  border-top:1px solid var(--linha);
+  font-family:'Space Mono',monospace;
+  font-size:.45rem;
+  color:var(--cinza);
+  line-height:1.8;
+}
+
+/* ── MAIN ── */
+.main{
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+
+/* TOPBAR */
+.topbar{
+  padding:16px 32px;
+  border-bottom:1px solid var(--linha);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background:var(--bg2);
+  position:sticky;
+  top:0;
+  z-index:50;
+}
+.topbar-title{
+  font-size:.72rem;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:var(--cinza-v);
+}
+.topbar-title span{color:var(--ouro);}
+.topbar-right{
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
+.badge{
+  padding:4px 10px;
+  background:rgba(201,168,76,.1);
+  border:1px solid rgba(201,168,76,.2);
+  color:var(--ouro);
+  font-family:'Space Mono',monospace;
+  font-size:.45rem;
+  letter-spacing:.1em;
+  border-radius:2px;
+}
+
+/* ── CONTENT PANELS ── */
+.panel{
+  display:none;
+  padding:32px;
+  flex:1;
+  overflow-y:auto;
+  animation:fadeIn .3s ease;
+}
+.panel.ativo{display:flex;flex-direction:column;gap:28px;}
+
+/* SECTION HEADER */
+.sec-header{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:20px;
+  flex-wrap:wrap;
+}
+.sec-titulo{
+  font-family:'Syne',sans-serif;
+  font-size:1.4rem;
+  font-weight:400;
+  line-height:1.2;
+  margin-bottom:6px;
+}
+.sec-titulo span{color:var(--ouro);}
+.sec-desc{
+  font-size:.62rem;
+  color:var(--cinza-v);
+  letter-spacing:.06em;
+  line-height:1.8;
+  max-width:520px;
+}
+
+/* CARDS GRID */
+.cards{
+  display:grid;
+  gap:2px;
+}
+.cards-2{grid-template-columns:1fr 1fr;}
+.cards-3{grid-template-columns:1fr 1fr 1fr;}
+
+.card{
+  background:var(--bg3);
+  border:1px solid var(--linha);
+  padding:24px;
+  position:relative;
+  overflow:hidden;
+  transition:border-color .3s;
+}
+.card:hover{border-color:rgba(201,168,76,.18);}
+.card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(to right,transparent,var(--ouro-s),transparent);
+  opacity:0;transition:opacity .3s;
+}
+.card:hover::before{opacity:1;}
+
+.card-label{
+  font-family:'Space Mono',monospace;
+  font-size:.45rem;
+  letter-spacing:.35em;
+  color:var(--cinza);
+  text-transform:uppercase;
+  margin-bottom:10px;
+}
+.card-value{
+  font-family:'Syne',sans-serif;
+  font-size:1.8rem;
+  font-weight:400;
+  color:var(--ouro);
+  line-height:1;
+  margin-bottom:6px;
+}
+.card-sub{
+  font-size:.58rem;
+  color:var(--cinza-v);
+  letter-spacing:.08em;
+}
+
+/* ── ENGINE CONTEÚDO ── */
+.engine-grid{
+  display:grid;
+  grid-template-columns:1fr 1.4fr;
+  gap:2px;
+}
+
+.form-group{
+  margin-bottom:18px;
+}
+.form-label{
+  display:block;
+  font-family:'Space Mono',monospace;
+  font-size:.48rem;
+  letter-spacing:.25em;
+  color:var(--cinza-v);
+  text-transform:uppercase;
+  margin-bottom:8px;
+}
+.form-select,.form-input,.form-textarea{
+  width:100%;
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.07);
+  color:var(--branco);
+  padding:12px 16px;
+  font-family:'Syne',sans-serif;
+  font-size:.68rem;
+  font-weight:300;
+  outline:none;
+  transition:border-color .3s;
+  appearance:none;
+  -webkit-appearance:none;
+}
+.form-select:focus,.form-input:focus,.form-textarea:focus{
+  border-color:rgba(201,168,76,.3);
+  background:rgba(201,168,76,.03);
+}
+.form-textarea{min-height:80px;resize:vertical;line-height:1.7;}
+.form-select option{background:var(--bg3);}
+
+.tags-grupo{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:8px;
+}
+.tag-toggle{
+  padding:6px 14px;
+  border:1px solid rgba(255,255,255,.07);
+  color:var(--cinza-v);
+  font-size:.52rem;
+  letter-spacing:.1em;
+  cursor:pointer;
+  transition:all .2s;
+  background:transparent;
+  font-family:'Syne',sans-serif;
+}
+.tag-toggle:hover{border-color:var(--ouro);color:var(--ouro);}
+.tag-toggle.on{
+  background:rgba(201,168,76,.1);
+  border-color:var(--ouro);
+  color:var(--ouro);
+}
+
+.btn-gerar{
+  width:100%;
+  padding:16px;
+  background:var(--ouro);
+  color:var(--bg);
+  border:none;
+  font-family:'Syne',sans-serif;
+  font-size:.62rem;
+  font-weight:500;
+  letter-spacing:.25em;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:all .3s;
+  position:relative;
+  overflow:hidden;
+}
+.btn-gerar:hover{background:var(--ouro-v);}
+.btn-gerar:disabled{opacity:.5;cursor:not-allowed;}
+
+.output-box{
+  background:var(--bg2);
+  border:1px solid var(--linha);
+  padding:28px;
+  min-height:400px;
+  display:flex;
+  flex-direction:column;
+  gap:0;
+  position:relative;
+}
+.output-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:20px;
+  padding-bottom:16px;
+  border-bottom:1px solid var(--linha);
+}
+.output-label{
+  font-family:'Space Mono',monospace;
+  font-size:.48rem;
+  letter-spacing:.3em;
+  color:var(--ouro);
+  text-transform:uppercase;
+}
+.output-actions{
+  display:flex;
+  gap:8px;
+}
+.btn-mini{
+  padding:5px 12px;
+  border:1px solid var(--linha);
+  background:transparent;
+  color:var(--cinza-v);
+  font-family:'Space Mono',monospace;
+  font-size:.42rem;
+  letter-spacing:.1em;
+  cursor:pointer;
+  transition:all .2s;
+}
+.btn-mini:hover{border-color:var(--ouro);color:var(--ouro);}
+
+.output-content{
+  flex:1;
+  font-size:.72rem;
+  line-height:2;
+  color:var(--branco);
+  letter-spacing:.03em;
+  white-space:pre-wrap;
+  font-family:'Syne',sans-serif;
+  font-weight:300;
+}
+.output-content.vazio{
+  color:var(--cinza);
+  font-style:italic;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:.62rem;
+  letter-spacing:.15em;
+}
+
+/* streaming cursor */
+.cursor-stream{
+  display:inline-block;
+  width:2px;height:14px;
+  background:var(--ouro);
+  animation:blink .8s step-end infinite;
+  vertical-align:middle;
+  margin-left:2px;
+}
+
+/* ── AGENTE FLOW ── */
+.flow-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:2px;
+}
+.etapa{
+  background:var(--bg3);
+  border:1px solid var(--linha);
+  padding:24px 20px;
+  position:relative;
+}
+.etapa::after{
+  content:'→';
+  position:absolute;
+  right:-14px;
+  top:50%;
+  transform:translateY(-50%);
+  color:var(--ouro-s);
+  font-size:1rem;
+  z-index:2;
+}
+.etapa:last-child::after{display:none;}
+.etapa-num{
+  font-family:'Space Mono',monospace;
+  font-size:.42rem;
+  color:var(--ouro-s);
+  letter-spacing:.3em;
+  margin-bottom:12px;
+}
+.etapa-nome{
+  font-size:.75rem;
+  font-weight:500;
+  letter-spacing:.08em;
+  margin-bottom:12px;
+  color:var(--ouro);
+}
+.etapa-desc{
+  font-size:.58rem;
+  color:var(--cinza-v);
+  line-height:1.8;
+  letter-spacing:.04em;
+}
+.etapa-acao{
+  margin-top:16px;
+  padding:8px 0 0;
+  border-top:1px solid var(--linha);
+  font-family:'Space Mono',monospace;
+  font-size:.45rem;
+  color:var(--cinza);
+  letter-spacing:.1em;
+}
+
+/* SCRIPTS PRÉ-CONFIGURADOS */
+.scripts-lista{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+.script-item{
+  background:var(--bg3);
+  border:1px solid var(--linha);
+  padding:20px 24px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  cursor:pointer;
+  transition:border-color .3s, background .3s;
+}
+.script-item:hover{border-color:rgba(201,168,76,.2);background:rgba(201,168,76,.02);}
+.script-info{flex:1;}
+.script-titulo{font-size:.72rem;font-weight:400;margin-bottom:4px;letter-spacing:.05em;}
+.script-meta{font-family:'Space Mono',monospace;font-size:.45rem;color:var(--cinza-v);letter-spacing:.12em;}
+.script-badge{
+  padding:4px 10px;
+  font-family:'Space Mono',monospace;
+  font-size:.42rem;
+  letter-spacing:.1em;
+  border-radius:2px;
+}
+.badge-reel{background:rgba(74,144,226,.1);border:1px solid rgba(74,144,226,.3);color:var(--azul);}
+.badge-story{background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.3);color:var(--ouro);}
+.badge-legenda{background:rgba(29,185,84,.1);border:1px solid rgba(29,185,84,.3);color:var(--verde);}
+
+/* SIMULADOR WHATSAPP */
+.wa-sim{
+  max-width:480px;
+  margin:0 auto;
+  background:#0B141A;
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:4px;
+  overflow:hidden;
+}
+.wa-topo{
+  background:#1F2C34;
+  padding:12px 20px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.wa-avatar{
+  width:38px;height:38px;border-radius:50%;
+  background:linear-gradient(140deg,var(--ouro-s),var(--ouro));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Playfair Display',serif;font-style:italic;
+  color:var(--bg);font-size:.9rem;
+}
+.wa-nome{font-size:.75rem;font-weight:400;color:#E9EDEF;margin-bottom:2px;}
+.wa-status{font-size:.58rem;color:#8696A0;}
+.wa-msgs{
+  padding:16px;
+  min-height:300px;
+  max-height:360px;
+  overflow-y:auto;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  background:#0B141A;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(255,255,255,.1) transparent;
+}
+.wa-balao{
+  max-width:80%;
+  padding:10px 14px 6px;
+  border-radius:8px;
+  font-size:.68rem;
+  line-height:1.7;
+}
+.wa-ia{
+  align-self:flex-start;
+  background:#1F2C34;
+  color:#E9EDEF;
+  border-bottom-left-radius:0;
+}
+.wa-usr{
+  align-self:flex-end;
+  background:#005C4B;
+  color:#E9EDEF;
+  border-bottom-right-radius:0;
+}
+.wa-hora{
+  font-size:.48rem;color:#8696A0;
+  text-align:right;margin-top:4px;
+}
+.wa-input-row{
+  background:#1F2C34;
+  padding:10px 16px;
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+.wa-input{
+  flex:1;background:#2A3942;border:none;
+  color:#D1D7DB;padding:10px 16px;
+  border-radius:24px;font-family:'Syne',sans-serif;
+  font-size:.65rem;outline:none;
+}
+.wa-input::placeholder{color:#8696A0;}
+.wa-send{
+  width:40px;height:40px;border-radius:50%;
+  background:var(--verde);border:none;cursor:pointer;
+  color:white;font-size:.85rem;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .2s;
+}
+.wa-send:hover{background:#25D366;}
+
+/* STATS LINHA */
+.stats-linha{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:2px;
+}
+
+/* PROGRESSO */
+.progresso-wrap{
+  background:rgba(255,255,255,.04);
+  height:3px;
+  border-radius:2px;
+  overflow:hidden;
+  margin-top:6px;
+}
+.progresso-bar{
+  height:100%;
+  background:linear-gradient(to right,var(--ouro-s),var(--ouro));
+  border-radius:2px;
+  transition:width .6s ease;
+}
+
+/* ── VITRINE EMBUTIDA ── */
+.vitrine-wrap{
+  position:relative;
+  width:100%;
+  height:calc(100vh - 57px);
+  display:flex;
+  flex-direction:column;
+}
+.vitrine-toolbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 20px;
+  background:var(--bg3);
+  border-bottom:1px solid var(--linha);
+  flex-shrink:0;
+  gap:12px;
+}
+.vitrine-url{
+  flex:1;
+  font-family:'Space Mono',monospace;
+  font-size:.5rem;
+  color:var(--cinza-v);
+  letter-spacing:.1em;
+  background:rgba(255,255,255,.03);
+  border:1px solid var(--linha);
+  padding:7px 14px;
+  outline:none;
+  color:var(--ouro);
+}
+.vitrine-btns{display:flex;gap:8px;}
+.vitrine-frame{
+  flex:1;
+  width:100%;
+  border:none;
+  background:var(--bg2);
+}
+.vitrine-view-btns{
+  display:flex;
+  gap:4px;
+}
+.vbtn{
+  padding:5px 10px;
+  border:1px solid var(--linha);
+  background:transparent;
+  color:var(--cinza-v);
+  font-family:'Space Mono',monospace;
+  font-size:.42rem;
+  letter-spacing:.1em;
+  cursor:pointer;
+  transition:all .2s;
+}
+.vbtn:hover,.vbtn.on{border-color:var(--ouro);color:var(--ouro);background:rgba(201,168,76,.05);}
+
+/* MOBILE */
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+@keyframes pulseVerde{0%,100%{box-shadow:0 0 0 0 rgba(29,185,84,.4);}50%{box-shadow:0 0 0 5px rgba(29,185,84,0);}}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+@keyframes slideIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+/* MOBILE */
+@media(max-width:900px){
+  .app{grid-template-columns:1fr;}
+  .sidebar{display:none;}
+  .engine-grid,.flow-grid,.cards-3,.cards-2{grid-template-columns:1fr;}
+  .etapa::after{display:none;}
+  .stats-linha{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-sys">JARVES · v2.0</div>
+    <div class="logo-name">Segunda Pele</div>
+    <div class="logo-status">
+      <div class="dot-live"></div>
+      Sistema ativo · Claude API
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Central</div>
+    <div class="nav-item ativo" onclick="trocarPanel('dashboard',this)">
+      <span class="nav-icon">◈</span> Dashboard
+    </div>
+    <div class="nav-section">Conteúdo</div>
+    <div class="nav-item" onclick="trocarPanel('engine',this)">
+      <span class="nav-icon">⚡</span> Engine de Scripts
+    </div>
+    <div class="nav-item" onclick="trocarPanel('biblioteca',this)">
+      <span class="nav-icon">◧</span> Biblioteca
+    </div>
+    <div class="nav-section">Atendimento</div>
+    <div class="nav-item" onclick="trocarPanel('fluxo',this)">
+      <span class="nav-icon">◎</span> Fluxo do Agente
+    </div>
+    <div class="nav-item" onclick="trocarPanel('simulador',this)">
+      <span class="nav-icon">◉</span> Simulador WhatsApp
+    </div>
+    <div class="nav-section">Cliente</div>
+    <div class="nav-item" onclick="trocarPanel('vitrine',this)">
+      <span class="nav-icon">◆</span> Vitrine Segunda Pele
+    </div>
+    <div class="nav-section">Sistema</div>
+    <div class="nav-item" onclick="trocarPanel('config',this)">
+      <span class="nav-icon">◫</span> Configuração
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    @alvesdemelosadraque<br>
+    12 peças · ciclo mensal<br>
+    Ouro 18K · SP · Tatuapé
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-title">Jarves · <span id="topbarLabel">Dashboard</span></div>
+    <div class="topbar-right">
+      <div class="badge">OURO 18K</div>
+      <div class="badge" id="vagasBadge">4 VAGAS</div>
+    </div>
+  </div>
+
+  <!-- ── DASHBOARD ── -->
+  <div class="panel ativo" id="panel-dashboard">
+    <div class="sec-header">
+      <div>
+        <div class="sec-titulo">Sistema <span>Operacional</span></div>
+        <div class="sec-desc">Segunda Pele · Engine de Conteúdo + Agente IA · Tudo em um só lugar.</div>
+      </div>
+    </div>
+
+    <div class="stats-linha">
+      <div class="card">
+        <div class="card-label">Ciclo Atual</div>
+        <div class="card-value">12</div>
+        <div class="card-sub">peças numeradas / mês</div>
+        <div class="progresso-wrap"><div class="progresso-bar" style="width:66%"></div></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Vagas Restantes</div>
+        <div class="card-value" id="vagasNum">4</div>
+        <div class="card-sub">neste ciclo · urgência real</div>
+        <div class="progresso-wrap"><div class="progresso-bar" style="width:33%"></div></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Scripts Gerados</div>
+        <div class="card-value" id="scriptsCount">0</div>
+        <div class="card-sub">via engine IA nesta sessão</div>
+        <div class="progresso-wrap"><div class="progresso-bar" style="width:0%" id="scriptProgress"></div></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Meta Mensal</div>
+        <div class="card-value">R$60k</div>
+        <div class="card-sub">high ticket · orgânico</div>
+        <div class="progresso-wrap"><div class="progresso-bar" style="width:45%"></div></div>
+      </div>
+    </div>
+
+    <div class="cards cards-2">
+      <div class="card" style="padding:28px;">
+        <div class="card-label" style="margin-bottom:16px">Funil Arpão — Status</div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:.62rem;color:var(--cinza-v)">Conteúdo Orgânico</span>
+            <span style="font-family:'Space Mono',monospace;font-size:.55rem;color:var(--verde)">● ATIVO</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:.62rem;color:var(--cinza-v)">ManyChat RESERVA</span>
+            <span style="font-family:'Space Mono',monospace;font-size:.55rem;color:var(--verde)">● ATIVO</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:.62rem;color:var(--cinza-v)">Landing Page Vitrine</span>
+            <span style="font-family:'Space Mono',monospace;font-size:.55rem;color:var(--ouro)">● DEPLOY</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:.62rem;color:var(--cinza-v)">Agente Mercedes/Bárbara</span>
+            <span style="font-family:'Space Mono',monospace;font-size:.55rem;color:var(--ouro)">● STAGING</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:.62rem;color:var(--cinza-v)">CRM · Leads Ativos</span>
+            <span style="font-family:'Space Mono',monospace;font-size:.55rem;color:var(--azul)">● EDILENE / KELLEN</span>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="padding:28px;">
+        <div class="card-label" style="margin-bottom:16px">7 Princípios Ativos</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="font-size:.62rem;color:var(--cinza-v);padding-left:12px;border-left:2px solid var(--ouro-s)">Luxo como presença, não posse</div>
+          <div style="font-size:.62rem;color:var(--cinza-v);padding-left:12px;border-left:2px solid var(--ouro-s)">Efeito Rosenthal</div>
+          <div style="font-size:.62rem;color:var(--cinza-v);padding-left:12px;border-left:2px solid var(--ouro-s)">Reserva cognitiva oculta</div>
+          <div style="font-size:.62rem;color:var(--cinza-v);padding-left:12px;border-left:2px solid var(--ouro-s)">Controle de escassez</div>
+          <div style="font-size:.62rem;color:var(--cinza-v);padding-left:12px;border-left:2px solid var(--ouro-s)">Superioridade de prova social</div>
+          <div style="font-size:.62rem;color:var(--cinza-v);padding-left:12px;border-left:2px solid var(--ouro-s)">Reciprocidade pela educação</div>
+          <div style="font-size:.62rem;color:var(--cinza-v);padding-left:12px;border-left:2px solid var(--ouro-s)">Ancoragem de preço</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="padding:28px;">
+      <div class="card-label" style="margin-bottom:16px">Próximas Ações · Plano de Contingência</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;flex-wrap:wrap;">
+        <div style="font-size:.62rem;color:var(--cinza-v);line-height:1.8;padding:16px;background:rgba(255,255,255,.02);border:1px solid var(--linha)">
+          <div style="color:var(--ouro);font-family:'Space Mono',monospace;font-size:.45rem;letter-spacing:.2em;margin-bottom:8px">CONTEÚDO</div>
+          Gerar 5 scripts/semana via Engine. Postar às 19h30. Fotos > Reels na proporção 70/30.
+        </div>
+        <div style="font-size:.62rem;color:var(--cinza-v);line-height:1.8;padding:16px;background:rgba(255,255,255,.02);border:1px solid var(--linha)">
+          <div style="color:var(--azul);font-family:'Space Mono',monospace;font-size:.45rem;letter-spacing:.2em;margin-bottom:8px">FUNIL</div>
+          Keyword RESERVA ativa. DM → qualificação → WhatsApp. Zero preço público. Zero desconto.
+        </div>
+        <div style="font-size:.62rem;color:var(--cinza-v);line-height:1.8;padding:16px;background:rgba(255,255,255,.02);border:1px solid var(--linha)">
+          <div style="color:var(--verde);font-family:'Space Mono',monospace;font-size:.45rem;letter-spacing:.2em;margin-bottom:8px">CONVERSÃO</div>
+          Parcelamento como alternativa ao desconto. Escassez real, nunca fabricada. Lista de espera prioritária.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ENGINE DE SCRIPTS ── -->
+  <div class="panel" id="panel-engine">
+    <div class="sec-header">
+      <div>
+        <div class="sec-titulo">Engine de <span>Conteúdo IA</span></div>
+        <div class="sec-desc">Gere scripts de Reels, Stories e legendas com a narrativa "Luxo Silencioso" calibrada para a Segunda Pele.</div>
+      </div>
+    </div>
+
+    <div class="engine-grid">
+      <!-- CONTROLES -->
+      <div class="card" style="padding:28px;">
+        <div class="form-group">
+          <label class="form-label">Formato</label>
+          <select class="form-select" id="formato">
+            <option value="reel">Reel / TikTok (30-60s)</option>
+            <option value="story">Story Sequência (3-5 frames)</option>
+            <option value="legenda">Legenda de Foto</option>
+            <option value="carrossel">Carrossel Educativo</option>
+            <option value="hook">Hook de Abertura (3s)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Ângulo Narrativo</label>
+          <select class="form-select" id="angulo">
+            <option value="postura">A postura de quem usa ouro maciço</option>
+            <option value="investimento">Ouro como investimento vivo</option>
+            <option value="escassez">12 peças — e então acabou</option>
+            <option value="artesao">17 anos nas mesmas mãos</option>
+            <option value="identidade">Você sabe o que carrega</option>
+            <option value="silencio">O luxo que não precisa se anunciar</option>
+            <option value="presenca">Presença antes de posse</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Princípio Psicológico</label>
+          <div class="tags-grupo" id="principios">
+            <button class="tag-toggle on" data-v="escassez">Escassez</button>
+            <button class="tag-toggle" data-v="identidade">Identidade</button>
+            <button class="tag-toggle" data-v="reciprocidade">Reciprocidade</button>
+            <button class="tag-toggle" data-v="prova_social">Prova Social</button>
+            <button class="tag-toggle" data-v="ancoragem">Ancoragem</button>
+            <button class="tag-toggle" data-v="rosenthal">Rosenthal</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contexto adicional (opcional)</label>
+          <textarea class="form-textarea" id="contexto" placeholder="Ex: Dia dos namorados, peça específica, lead fria reaquecendo..."></textarea>
+        </div>
+        <button class="btn-gerar" id="btnGerar" onclick="gerarScript()">
+          ⚡ Gerar Script Agora
+        </button>
+      </div>
+
+      <!-- OUTPUT -->
+      <div class="output-box">
+        <div class="output-header">
+          <div class="output-label" id="outputLabel">Aguardando geração...</div>
+          <div class="output-actions">
+            <button class="btn-mini" onclick="copiarScript()">COPIAR</button>
+            <button class="btn-mini" onclick="salvarScript()">SALVAR</button>
+          </div>
+        </div>
+        <div class="output-content vazio" id="outputContent">
+          Configure o formato e ângulo ao lado → clique em Gerar
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── BIBLIOTECA ── -->
+  <div class="panel" id="panel-biblioteca">
+    <div class="sec-header">
+      <div>
+        <div class="sec-titulo">Biblioteca de <span>Scripts</span></div>
+        <div class="sec-desc">Scripts validados, salvos e prontos para usar. Benchmark: "Você sabe o peso..."</div>
+      </div>
+    </div>
+    <div class="scripts-lista" id="bibliotecaLista">
+      <!-- presets fixos -->
+      <div class="script-item" onclick="carregarScript(0)">
+        <div class="script-info">
+          <div class="script-titulo">O Peso do Silêncio · Reel Benchmark</div>
+          <div class="script-meta">ESCASSEZ · IDENTIDADE · 45s</div>
+        </div>
+        <span class="script-badge badge-reel">REEL</span>
+      </div>
+      <div class="script-item" onclick="carregarScript(1)">
+        <div class="script-info">
+          <div class="script-titulo">17 Anos, Uma Peça · Story Sequência</div>
+          <div class="script-meta">ROSENTHAL · ARTESÃO · 5 frames</div>
+        </div>
+        <span class="script-badge badge-story">STORY</span>
+      </div>
+      <div class="script-item" onclick="carregarScript(2)">
+        <div class="script-info">
+          <div class="script-titulo">Você Sabe o Quilate · Legenda Foto</div>
+          <div class="script-meta">ÂNCORA · PROVA SOCIAL · benchmark</div>
+        </div>
+        <span class="script-badge badge-legenda">LEGENDA</span>
+      </div>
+      <div class="script-item" onclick="carregarScript(3)">
+        <div class="script-info">
+          <div class="script-titulo">12 Peças. Apenas. · Hook 3s</div>
+          <div class="script-meta">ESCASSEZ PURA · abertura de reel</div>
+        </div>
+        <span class="script-badge badge-reel">HOOK</span>
+      </div>
+    </div>
+    <!-- scripts salvos dinamicamente -->
+    <div id="scriptsGravados" style="display:flex;flex-direction:column;gap:2px;margin-top:2px;"></div>
+  </div>
+
+  <!-- ── FLUXO DO AGENTE ── -->
+  <div class="panel" id="panel-fluxo">
+    <div class="sec-header">
+      <div>
+        <div class="sec-titulo">Fluxo do <span>Agente IA</span></div>
+        <div class="sec-desc">Arquitetura de atendimento WhatsApp Business · Bárbara / Mercedes · 4 etapas de sofisticação crescente.</div>
+      </div>
+    </div>
+    <div class="flow-grid">
+      <div class="etapa">
+        <div class="etapa-num">01 · RECEPÇÃO</div>
+        <div class="etapa-nome">Identificação</div>
+        <div class="etapa-desc">Via n8n + CRM: identifica lead pelo número, puxa nome e histórico. Trata pelo nome desde a primeira mensagem.</div>
+        <div class="etapa-acao">n8n → CRM lookup → nome + status</div>
+      </div>
+      <div class="etapa">
+        <div class="etapa-num">02 · QUALIFICAÇÃO</div>
+        <div class="etapa-nome">Filtro de Intenção</div>
+        <div class="etapa-desc">Perguntas abertas sobre estilo e ocasião. Filtra: busca preço ou busca exclusividade? Só avança quem demonstra fit.</div>
+        <div class="etapa-acao">Pergunta aberta → análise de resposta</div>
+      </div>
+      <div class="etapa">
+        <div class="etapa-num">03 · CURADORIA</div>
+        <div class="etapa-nome">Acesso VIP</div>
+        <div class="etapa-desc">Envia fotos exclusivas não disponíveis no site. Apresenta a peça certa para o momento da cliente. Ativa escassez real.</div>
+        <div class="etapa-acao">Foto exclusiva + "4 vagas neste ciclo"</div>
+      </div>
+      <div class="etapa">
+        <div class="etapa-num">04 · FECHAMENTO</div>
+        <div class="etapa-nome">Conversão</div>
+        <div class="etapa-desc">Link de pagamento direto ou agendamento de chamada com Sadraque. Zero fricção. Tom: consultoria, nunca venda.</div>
+        <div class="etapa-acao">Link pix/cartão ou agenda call</div>
+      </div>
+    </div>
+
+    <div class="cards cards-2" style="margin-top:0;">
+      <div class="card" style="padding:28px;">
+        <div class="card-label" style="margin-bottom:16px">Regras Absolutas do Agente</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="font-size:.62rem;color:var(--cinza-v);line-height:1.8;padding-left:12px;border-left:2px solid var(--vermelho)">Nunca revelar preço sem qualificação completa</div>
+          <div style="font-size:.62rem;color:var(--cinza-v);line-height:1.8;padding-left:12px;border-left:2px solid var(--vermelho)">Nunca oferecer desconto — alternativa: parcelamento</div>
+          <div style="font-size:.62rem;color:var(--cinza-v);line-height:1.8;padding-left:12px;border-left:2px solid var(--vermelho)">Nunca compartilhar WhatsApp em comentários públicos</div>
+          <div style="font-size:.62rem;color:var(--cinza-v);line-height:1.8;padding-left:12px;border-left:2px solid var(--vermelho)">Nunca usar a palavra "promoção" ou "oferta"</div>
+          <div style="font-size:.62rem;color:var(--cinza-v);line-height:1.8;padding-left:12px;border-left:2px solid var(--verde)">Sempre: escassez real, não fabricada</div>
+          <div style="font-size:.62rem;color:var(--cinza-v);line-height:1.8;padding-left:12px;border-left:2px solid var(--verde)">Sempre: tom de consultora — nunca vendedora</div>
+        </div>
+      </div>
+      <div class="card" style="padding:28px;">
+        <div class="card-label" style="margin-bottom:16px">Gatilhos de Ativação</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="font-size:.62rem;color:var(--cinza-v);line-height:1.8;display:flex;justify-content:space-between;align-items:center;">
+            <span>Keyword RESERVA no DM</span>
+            <span style="font-family:'Space Mono',monospace;font-size:.45rem;color:var(--verde)">→ fluxo automático</span>
+          </div>
+          <div style="font-size:.62rem;color:var(--cinza-v);line-height:1.8;display:flex;justify-content:space-between;align-items:center;">
+            <span>Clique em "Consultar Valor" (site)</span>
+            <span style="font-family:'Space Mono',monospace;font-size:.45rem;color:var(--verde)">→ Mercedes ativa</span>
+          </div>
+          <div style="font-size:.62rem;color:var(--cinza-v);line-height:1.8;display:flex;justify-content:space-between;align-items:center;">
+            <span>Salvo nos favoritos 3x</span>
+            <span style="font-family:'Space Mono',monospace;font-size:.45rem;color:var(--ouro)">→ DM manual</span>
+          </div>
+          <div style="font-size:.62rem;color:var(--cinza-v);line-height:1.8;display:flex;justify-content:space-between;align-items:center;">
+            <span>Story view 5x sem resposta</span>
+            <span style="font-family:'Space Mono',monospace;font-size:.45rem;color:var(--ouro)">→ DM reaquecimento</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SIMULADOR ── -->
+  <div class="panel" id="panel-simulador">
+    <div class="sec-header">
+      <div>
+        <div class="sec-titulo">Simulador <span>WhatsApp</span></div>
+        <div class="sec-desc">Teste o fluxo do agente Bárbara/Mercedes em tempo real antes de subir para o WhatsApp Business.</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;">
+      <div class="wa-sim">
+        <div class="wa-topo">
+          <div class="wa-avatar">B</div>
+          <div>
+            <div class="wa-nome">Bárbara · Segunda Pele</div>
+            <div class="wa-status">online</div>
+          </div>
+        </div>
+        <div class="wa-msgs" id="waMsgs">
+          <div class="wa-balao wa-ia">
+            Olá. Sou a Bárbara, consultora da Segunda Pele. Joias de ouro 18K, feitas à mão — 12 por mês, numeradas. Como posso te ajudar?
+            <div class="wa-hora">19:01</div>
+          </div>
+        </div>
+        <div class="wa-input-row">
+          <input class="wa-input" id="waInput" type="text" placeholder="Digite sua mensagem..." />
+          <button class="wa-send" onclick="enviarWA()">↑</button>
+        </div>
+      </div>
+
+      <div class="card" style="padding:28px;">
+        <div class="card-label" style="margin-bottom:20px">Respostas Pré-configuradas · Alta Conversão</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <button class="btn-mini" style="text-align:left;padding:10px 14px;width:100%" onclick="simularLeadMsg('Quanto custa o anel?')">
+            Lead: "Quanto custa o anel?"
+          </button>
+          <button class="btn-mini" style="text-align:left;padding:10px 14px;width:100%" onclick="simularLeadMsg('Vi no story, quero saber mais')">
+            Lead: "Vi no story, quero saber mais"
+          </button>
+          <button class="btn-mini" style="text-align:left;padding:10px 14px;width:100%" onclick="simularLeadMsg('Tem desconto?')">
+            Lead: "Tem desconto?"
+          </button>
+          <button class="btn-mini" style="text-align:left;padding:10px 14px;width:100%" onclick="simularLeadMsg('Preciso de um presente especial')">
+            Lead: "Preciso de um presente especial"
+          </button>
+          <button class="btn-mini" style="text-align:left;padding:10px 14px;width:100%" onclick="simularLeadMsg('RESERVA')">
+            Lead: "RESERVA" (keyword trigger)
+          </button>
+        </div>
+        <div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--linha);">
+          <div class="card-label">Análise da Conversa</div>
+          <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;justify-content:space-between;">
+              <span style="font-size:.6rem;color:var(--cinza-v)">Intenção detectada</span>
+              <span style="font-family:'Space Mono',monospace;font-size:.5rem;color:var(--ouro)" id="intencaoLabel">–</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;">
+              <span style="font-size:.6rem;color:var(--cinza-v)">Etapa do funil</span>
+              <span style="font-family:'Space Mono',monospace;font-size:.5rem;color:var(--azul)" id="etapaLabel">–</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;">
+              <span style="font-size:.6rem;color:var(--cinza-v)">Score de qualificação</span>
+              <span style="font-family:'Space Mono',monospace;font-size:.5rem;color:var(--verde)" id="scoreLabel">–</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CONFIG ── -->
+  <div class="panel" id="panel-config">
+    <div class="sec-header">
+      <div>
+        <div class="sec-titulo"><span>Configuração</span> do Sistema</div>
+        <div class="sec-desc">Parâmetros do Jarves · Segunda Pele · Ajuste conforme o ciclo.</div>
+      </div>
+    </div>
+    <div class="cards cards-2">
+      <div class="card" style="padding:28px;">
+        <div class="card-label" style="margin-bottom:16px">Identidade das Agentes</div>
+        <div class="form-group">
+          <label class="form-label">Nome da Agente Principal</label>
+          <input class="form-input" id="cfgNomeAgente" value="Mercedes" type="text"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Vagas no Ciclo Atual</label>
+          <input class="form-input" id="cfgVagas" value="4" type="number" min="1" max="12"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">WhatsApp (com DDI)</label>
+          <input class="form-input" id="cfgWA" value="5511999999999" type="text"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Instagram</label>
+          <input class="form-input" id="cfgIG" value="@alvesdemelosadraque" type="text"/>
+        </div>
+        <button class="btn-gerar" onclick="salvarConfig()">Salvar Configuração</button>
+      </div>
+      <div class="card" style="padding:28px;">
+        <div class="card-label" style="margin-bottom:16px">Sistema · Notas de Versão</div>
+        <div style="font-size:.62rem;color:var(--cinza-v);line-height:2;font-family:'Space Mono',monospace;">
+          JARVES v2.0<br>
+          ─────────────────────<br>
+          ✓ Engine de Scripts IA<br>
+          ✓ Biblioteca de Conteúdo<br>
+          ✓ Fluxo Agente 4 Etapas<br>
+          ✓ Simulador WhatsApp<br>
+          ✓ Dashboard Operacional<br>
+          ─────────────────────<br>
+          Powered by Claude API<br>
+          Deploy: GitHub Pages<br>
+          Repo: sadraquemelo/Jarves-
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── VITRINE EMBUTIDA ── -->
+  <div class="panel" id="panel-vitrine" style="padding:0;gap:0;">
+    <div class="vitrine-wrap">
+      <div class="vitrine-toolbar">
+        <div class="vitrine-view-btns">
+          <button class="vbtn on" id="vbtnDesktop" onclick="setVitrineView('desktop')">Desktop</button>
+          <button class="vbtn" id="vbtnTablet" onclick="setVitrineView('tablet')">Tablet</button>
+          <button class="vbtn" id="vbtnMobile" onclick="setVitrineView('mobile')">Mobile</button>
+        </div>
+        <input class="vitrine-url" id="vitrineUrl" value="segunda-pele-vitrine.html" readonly />
+        <div class="vitrine-btns">
+          <button class="btn-mini" onclick="recarregarVitrine()">↺ RELOAD</button>
+          <button class="btn-mini" onclick="abrirVitrine()">↗ ABRIR</button>
+        </div>
+      </div>
+      <div style="flex:1;display:flex;align-items:center;justify-content:center;background:#0a0c0e;overflow:auto;padding:0;" id="vitrineViewport">
+        <iframe
+          id="vitrineFrame"
+          src="segunda-pele-vitrine.html"
+          class="vitrine-frame"
+          style="width:100%;height:100%;border:none;"
+          title="Segunda Pele Vitrine"
+        ></iframe>
+      </div>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<script>
+/* ─────── NAVEGAÇÃO ─────── */
+function trocarPanel(id, el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('ativo'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('ativo'));
+  document.getElementById('panel-'+id).classList.add('ativo');
+  el.classList.add('ativo');
+  const labels = {dashboard:'Dashboard',engine:'Engine de Scripts',biblioteca:'Biblioteca',fluxo:'Fluxo do Agente',simulador:'Simulador WA',config:'Configuração',vitrine:'Vitrine · Segunda Pele'};
+  document.getElementById('topbarLabel').textContent = labels[id] || id;
+
+  // ao entrar na vitrine, garante que o iframe carregou
+  if(id === 'vitrine'){
+    const fr = document.getElementById('vitrineFrame');
+    if(!fr.src || fr.src === 'about:blank') fr.src = 'segunda-pele-vitrine.html';
+  }
+}
+
+/* ─────── VITRINE EMBUTIDA ─────── */
+const VITRINE_SIZES = {
+  desktop: {width:'100%',   height:'100%',  shadow:'none'},
+  tablet:  {width:'768px',  height:'1024px',shadow:'0 0 0 1px rgba(201,168,76,.2)'},
+  mobile:  {width:'390px',  height:'844px', shadow:'0 0 0 1px rgba(201,168,76,.3)'}
+};
+
+function setVitrineView(modo){
+  const frame = document.getElementById('vitrineFrame');
+  const vp    = document.getElementById('vitrineViewport');
+  const s     = VITRINE_SIZES[modo];
+
+  document.querySelectorAll('.vbtn').forEach(b=>b.classList.remove('on'));
+  document.getElementById('vbtn'+modo.charAt(0).toUpperCase()+modo.slice(1)).classList.add('on');
+
+  if(modo === 'desktop'){
+    vp.style.padding = '0';
+    frame.style.width  = '100%';
+    frame.style.height = '100%';
+    frame.style.boxShadow = 'none';
+    frame.style.borderRadius = '0';
+  } else {
+    vp.style.padding = '24px';
+    frame.style.width  = s.width;
+    frame.style.height = s.height;
+    frame.style.boxShadow = s.shadow;
+    frame.style.borderRadius = '8px';
+    frame.style.flex = 'none';
+  }
+}
+
+function recarregarVitrine(){
+  const fr = document.getElementById('vitrineFrame');
+  fr.src = fr.src;
+}
+
+function abrirVitrine(){
+  window.open('segunda-pele-vitrine.html','_blank');
+}
+
+/* ─────── TAGS TOGGLE ─────── */
+document.querySelectorAll('.tag-toggle').forEach(t=>{
+  t.addEventListener('click',()=>t.classList.toggle('on'));
+});
+
+/* ─────── CONFIG VAGAS ─────── */
+const cfgVagasEl = document.getElementById('cfgVagas');
+if(cfgVagasEl){
+  cfgVagasEl.addEventListener('input',()=>{
+    const v = cfgVagasEl.value;
+    document.getElementById('vagasNum').textContent = v;
+    document.getElementById('vagasBadge').textContent = v+' VAGAS';
+  });
+}
+function salvarConfig(){
+  const v = document.getElementById('cfgVagas').value;
+  document.getElementById('vagasNum').textContent = v;
+  document.getElementById('vagasBadge').textContent = v+' VAGAS';
+  alert('Configuração salva. Recarregue a vitrine para aplicar.');
+}
+
+/* ─────── ENGINE DE SCRIPTS ─────── */
+const SYSTEM_ENGINE = `Você é o motor criativo da Segunda Pele — joalheria artesanal de ouro 18K, São Paulo, fundada em 2009 por Sadraque Melo.
+
+MISSÃO: Gerar scripts de conteúdo para Instagram/TikTok com a narrativa "Luxo Silencioso".
+
+PRINCÍPIO CENTRAL: O conteúdo NÃO mostra produtos. Ele instala uma postura, uma identidade, um estado de espírito. "A postura de quem usa ouro maciço" é mais poderoso do que "veja este anel."
+
+BENCHMARK validado (use como referência de tom):
+"Você sabe o peso. Você sabe o quilate. Você sabe quem fez. Isso é luxo real."
+
+REGRAS DE CRIAÇÃO:
+- Nunca mencionar preço
+- Nunca usar palavras: promoção, desconto, oferta, barato, acessível
+- Sempre: escassez real (12 peças/mês), artesão nomeado, ouro 18K certificado
+- Tom: silêncio elegante, presença, não ostentação
+- Call to action: sempre RESERVA (nunca "compre", nunca "clique no link")
+- Frases curtas. Ritmo cinematográfico. Pausas têm peso.
+
+FORMATOS:
+- Reel/TikTok: inclua [CENA], [VOZ], [LEGENDA] e [CTA FINAL]
+- Story sequência: numere cada frame com o visual e o texto
+- Legenda de foto: parágrafo único, sem hashtags genéricas, máximo 5 hashtags ultra-nicho
+- Carrossel: numere cada slide com título e texto
+- Hook 3s: apenas as primeiras palavras que param o scroll`;
+
+let scriptsCount = 0;
+let ultimoScript = '';
+const scriptsSalvos = [];
+
+// scripts pré-definidos na biblioteca
+const SCRIPTS_PRESET = [
+  {titulo:'O Peso do Silêncio', conteudo:`[REEL · 45s · "O Peso do Silêncio"]
+
+[CENA 1 · 0-3s]
+Close extremo numa mão feminina. Anel de ouro. Sem rosto. Sem contexto.
+[VOZ]: "Você sabe o que é sentir o peso do que é real?"
+
+[CENA 2 · 3-12s]  
+Mãos do artesão trabalhando o metal. Movimento lento. Sem música alta — só o som do ouro.
+[VOZ]: "17 anos. O mesmo homem. O mesmo ouro. Cada peça numerada antes mesmo de ter um dono."
+
+[CENA 3 · 12-25s]
+A peça pronta, em luz natural. Sem fundo branco. Sem estúdio.
+[VOZ]: "Não é sobre ter uma joia. É sobre saber o que você carrega."
+
+[CENA 4 · 25-40s]
+Mulher, de costas, saindo. A peça visível por um segundo.
+[VOZ]: "12 peças. Por mês. Apenas."
+
+[CTA FINAL · 40-45s]
+Tela preta. Texto: RESERVA — para quem já sabe.
+[LEGENDA]: "Para qual momento da sua vida estamos forjando sua próxima Segunda Pele?"
+
+#segundapele #ouromassico #joia18k #luxosilencioso #joalheriaartesanal`},
+  {titulo:'17 Anos, Uma Peça', conteudo:`[STORY SEQUÊNCIA · 5 frames]
+
+[FRAME 1]
+Visual: Foto em preto e branco. Mãos do artesão jovem, 2009.
+Texto: "2009. O primeiro forno. A primeira chama."
+
+[FRAME 2]
+Visual: Mesmas mãos, hoje. Close no anel sendo polido.
+Texto: "17 anos depois. O mesmo ritual."
+
+[FRAME 3]
+Visual: Linha de 12 peças numeradas.
+Texto: "12 por mês. Nunca mais. Nunca menos."
+
+[FRAME 4]
+Visual: Certificado com número e assinatura à mão.
+Texto: "Cada uma sai com nome, número e história."
+
+[FRAME 5]
+Visual: Peça no pulso. Nada mais visível.
+Texto: "Esse é o trabalho da minha vida. Não tenho pressa para ele."
+CTA: RESERVA nos stories`},
+  {titulo:'Você Sabe o Quilate', conteudo:`[LEGENDA DE FOTO]
+
+Você sabe o peso. Você sabe o quilate. Você sabe quem fez.
+
+Não é sobre usar uma joia. É sobre saber o que você carrega.
+
+Ouro 18K. Feito à mão. Numerado. Certificado.
+Desde 2009, o mesmo artesão. As mesmas mãos. O mesmo rigor.
+
+12 peças por mês.
+Quem sabe, sabe.
+
+Digite RESERVA para saber se ainda há vaga no ciclo atual.
+
+#segundapele #ouromassico #joia18k #joalheriadigital #luxoreal`},
+  {titulo:'12 Peças. Apenas.', conteudo:`[HOOK DE ABERTURA · 3 SEGUNDOS]
+
+Opção A (voz):
+"12 peças. Por mês. Depois disso, você espera."
+
+Opção B (texto em tela):
+12.
+Apenas 12.
+Por mês.
+
+Opção C (cinematográfico):
+[Contagem regressiva visual: 12 → 11 → 10]
+Cada número some. A última peça fica.
+[CORTE]`}
+];
+
+function carregarScript(idx){
+  trocarPanel('engine', document.querySelector('.nav-item:nth-child(5)'));
+  const s = SCRIPTS_PRESET[idx];
+  mostrarOutput(s.conteudo, s.titulo);
+}
+
+async function gerarScript(){
+  const fmt = document.getElementById('formato').value;
+  const ang = document.getElementById('angulo').value;
+  const ctx = document.getElementById('contexto').value;
+  const tags = [...document.querySelectorAll('.tag-toggle.on')].map(t=>t.dataset.v).join(', ');
+
+  const btn = document.getElementById('btnGerar');
+  btn.disabled = true;
+  btn.textContent = '⟳ Gerando...';
+
+  const prompt = `Gere um script de ${fmt} para a Segunda Pele com:
+- Ângulo narrativo: "${ang}"
+- Princípios psicológicos ativos: ${tags}
+${ctx ? `- Contexto adicional: ${ctx}` : ''}
+
+Siga rigorosamente o formato correto para ${fmt}. Use o benchmark de tom como referência.`;
+
+  const out = document.getElementById('outputContent');
+  out.classList.remove('vazio');
+  out.innerHTML = '<span class="cursor-stream"></span>';
+
+  try{
+    const res = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system: SYSTEM_ENGINE,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    const data = await res.json();
+    const txt = data.content?.[0]?.text || 'Erro na geração.';
+    ultimoScript = txt;
+    mostrarOutput(txt, `${fmt.toUpperCase()} · ${ang.substring(0,30)}...`);
+    scriptsCount++;
+    document.getElementById('scriptsCount').textContent = scriptsCount;
+    const p = Math.min(scriptsCount*20, 100);
+    document.getElementById('scriptProgress').style.width = p+'%';
+  }catch(e){
+    out.textContent = 'Erro de conexão. Verifique a API key e tente novamente.';
+  }
+
+  btn.disabled = false;
+  btn.textContent = '⚡ Gerar Script Agora';
+}
+
+function mostrarOutput(txt, label){
+  const out = document.getElementById('outputContent');
+  const lbl = document.getElementById('outputLabel');
+  out.classList.remove('vazio');
+  out.textContent = txt;
+  ultimoScript = txt;
+  if(label) lbl.textContent = label;
+}
+
+function copiarScript(){
+  if(!ultimoScript){ alert('Gere um script primeiro.'); return; }
+  navigator.clipboard.writeText(ultimoScript).then(()=>alert('Script copiado!'));
+}
+
+function salvarScript(){
+  if(!ultimoScript){ alert('Gere um script primeiro.'); return; }
+  scriptsSalvos.push({titulo:'Script '+(scriptsSalvos.length+1), conteudo:ultimoScript});
+  const container = document.getElementById('scriptsGravados');
+  const div = document.createElement('div');
+  div.className = 'script-item';
+  div.innerHTML = `<div class="script-info"><div class="script-titulo">Script Gerado #${scriptsSalvos.length}</div><div class="script-meta">SALVO MANUALMENTE</div></div><span class="script-badge badge-reel">SALVO</span>`;
+  div.onclick = ()=>{ mostrarOutput(ultimoScript,'Script Salvo'); trocarPanel('engine',document.querySelector('.nav-item.ativo')); };
+  container.appendChild(div);
+  alert('Script salvo na biblioteca!');
+}
+
+/* ─────── SIMULADOR WHATSAPP ─────── */
+const SYSTEM_BARBARA = `Você é Bárbara, consultora WhatsApp da Segunda Pele — joalheria de ouro 18K artesanal, São Paulo, 2009.
+
+Tom: sofisticado, caloroso, nunca apressado. Máximo 2 parágrafos curtos.
+
+REGRAS:
+- Se perguntarem preço: "O valor é discutido em consultoria — ele carrega mais do que um número."
+- Nunca desconto — alternativa: parcelamento
+- Escassez: "Temos 4 vagas neste ciclo"
+- Se "RESERVA": ative o fluxo imediatamente com entusiasmo contido
+- Convide para WhatsApp privado, nunca compartilhe número publicamente
+- Identifique intenção: CURIOSIDADE / INTERESSE / ALTA INTENÇÃO`;
+
+let histWA = [];
+
+async function enviarWA(){
+  const inp = document.getElementById('waInput');
+  const txt = inp.value.trim();
+  if(!txt) return;
+  inp.value='';
+  addWAMsg(txt,'usr');
+  histWA.push({role:'user',content:txt});
+  analisarConversa(txt);
+
+  try{
+    const r = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:400,
+        system: SYSTEM_BARBARA,
+        messages: histWA
+      })
+    });
+    const d = await r.json();
+    const resp = d.content?.[0]?.text || 'Um momento, por favor...';
+    histWA.push({role:'assistant',content:resp});
+    addWAMsg(resp,'ia');
+  }catch(e){
+    addWAMsg('Problema de conexão. Tente novamente.','ia');
+  }
+}
+
+function simularLeadMsg(txt){
+  document.getElementById('waInput').value = txt;
+  enviarWA();
+}
+
+function addWAMsg(txt, tipo){
+  const msgs = document.getElementById('waMsgs');
+  const div = document.createElement('div');
+  div.className = `wa-balao wa-${tipo}`;
+  div.style.animation = 'slideIn .3s ease forwards';
+  const hora = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  div.innerHTML = txt.replace(/\n/g,'<br>')+`<div class="wa-hora">${hora}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function analisarConversa(txt){
+  const t = txt.toLowerCase();
+  let intencao='CURIOSIDADE', etapa='RECEPÇÃO', score='30%';
+  if(t.includes('quanto') || t.includes('preço') || t.includes('valor')){
+    intencao='INTERESSE'; etapa='QUALIFICAÇÃO'; score='55%';
+  }
+  if(t.includes('reserva') || t.includes('quero') || t.includes('presente')){
+    intencao='ALTA INTENÇÃO'; etapa='CURADORIA'; score='80%';
+  }
+  if(t.includes('desconto')){
+    intencao='SENSÍVEL A PREÇO'; etapa='QUALIFICAÇÃO'; score='40%';
+  }
+  document.getElementById('intencaoLabel').textContent = intencao;
+  document.getElementById('etapaLabel').textContent = etapa;
+  document.getElementById('scoreLabel').textContent = score;
+}
+
+document.getElementById('waInput').addEventListener('keydown',e=>{if(e.key==='Enter')enviarWA();});
+document.getElementById('inputChat') && document.getElementById('inputChat').addEventListener('keydown',e=>{if(e.key==='Enter')enviarWA();});
+</script>
+</body>
+</html>

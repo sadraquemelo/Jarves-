@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Segunda Pele · Galeria de Imersão</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Raleway:wght@100;200;300;400&family=EB+Garamond:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --charcoal:    #1C1A18;
+  --charcoal-2:  #232120;
+  --charcoal-3:  #2A2825;
+  --nude:        #C8B89A;
+  --nude-claro:  #DDD0BC;
+  --nude-escuro: #A89070;
+  --ouro:        #C9A84C;
+  --ouro-brilho: #E8C96A;
+  --ouro-fosco:  #9A7A38;
+  --branco-perola: #F0EAE0;
+  --cinza-quente: #6A6460;
+  --sombra:      rgba(0,0,0,0.6);
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--charcoal);
+  color: var(--branco-perola);
+  font-family: 'Raleway', sans-serif;
+  font-weight: 200;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ── GRAIN TEXTURE ── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ── CUSTOM CURSOR ── */
+#cur { position:fixed; width:8px; height:8px; background:var(--ouro); border-radius:50%; pointer-events:none; z-index:9999; transform:translate(-50%,-50%); transition:width .2s, height .2s, background .2s; mix-blend-mode:screen; }
+#cur-r { position:fixed; width:40px; height:40px; border:1px solid rgba(201,168,76,.35); border-radius:50%; pointer-events:none; z-index:9998; transform:translate(-50%,-50%); transition:all .45s cubic-bezier(.23,1,.32,1); }
+body:has(a:hover) #cur, body:has(button:hover) #cur { width:4px; height:4px; background:var(--ouro-brilho); }
+body:has(a:hover) #cur-r, body:has(button:hover) #cur-r { width:56px; height:56px; border-color:rgba(201,168,76,.6); }
+
+/* ── BARRA LATERAL ESQUERDA ── */
+.sidebar-line {
+  position: fixed;
+  left: 32px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  z-index: 50;
+}
+.sidebar-line::before, .sidebar-line::after {
+  content: '';
+  display: block;
+  width: 1px;
+  height: 60px;
+  background: linear-gradient(to bottom, transparent, var(--ouro-fosco));
+}
+.sidebar-line::after {
+  background: linear-gradient(to bottom, var(--ouro-fosco), transparent);
+}
+.sidebar-text {
+  font-size: .5rem;
+  letter-spacing: .45em;
+  text-transform: uppercase;
+  color: var(--ouro-fosco);
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 200;
+  padding: 32px 72px 32px 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(180deg, rgba(28,26,24,.98) 0%, transparent 100%);
+}
+.logo-marca {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.logo-principal {
+  font-family: 'Playfair Display', serif;
+  font-weight: 300;
+  font-size: 1.05rem;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  color: var(--nude-claro);
+}
+.logo-sub {
+  font-size: .48rem;
+  letter-spacing: .5em;
+  text-transform: uppercase;
+  color: var(--ouro-fosco);
+}
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+}
+.nav-link {
+  font-size: .52rem;
+  letter-spacing: .35em;
+  text-transform: uppercase;
+  color: var(--cinza-quente);
+  text-decoration: none;
+  transition: color .3s;
+  cursor: none;
+}
+.nav-link:hover { color: var(--nude-claro); }
+.nav-cta {
+  padding: 10px 24px;
+  border: 1px solid rgba(201,168,76,.3);
+  font-size: .5rem;
+  letter-spacing: .35em;
+  text-transform: uppercase;
+  color: var(--ouro);
+  text-decoration: none;
+  transition: all .35s;
+  cursor: none;
+}
+.nav-cta:hover { background: var(--ouro); color: var(--charcoal); border-color: var(--ouro); }
+
+/* ── HERO IMERSÃO ── */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 0 72px 0 120px;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* fundo: ondas douradas */
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.hero-bg::before {
+  content: '';
+  position: absolute;
+  width: 800px; height: 800px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 60% 50%, rgba(201,168,76,.07) 0%, transparent 65%);
+  top: 50%; right: -10%;
+  transform: translateY(-50%);
+}
+.hero-bg::after {
+  content: '';
+  position: absolute;
+  width: 500px; height: 500px;
+  border: 1px solid rgba(201,168,76,.06);
+  border-radius: 50%;
+  top: 50%; right: 8%;
+  transform: translateY(-50%);
+  animation: breathe 8s ease-in-out infinite;
+}
+
+.hero-ornamento {
+  position: absolute;
+  right: 15%;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 340px;
+  height: 340px;
+  border: 1px solid rgba(201,168,76,.1);
+  transform: translateY(-50%) rotate(45deg);
+  animation: ornRotate 30s linear infinite;
+}
+.hero-ornamento::before {
+  content: '';
+  position: absolute;
+  inset: 24px;
+  border: 1px solid rgba(201,168,76,.06);
+}
+.hero-ornamento::after {
+  content: '';
+  position: absolute;
+  inset: 50px;
+  border: 1px solid rgba(201,168,76,.04);
+}
+
+/* Orbe dourado */
+.hero-orbe {
+  position: absolute;
+  right: 22%;
+  top: 50%;
+  transform: translate(50%, -50%);
+  width: 180px; height: 180px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 38% 35%, var(--ouro-brilho) 0%, var(--ouro) 30%, var(--ouro-fosco) 60%, transparent 80%);
+  box-shadow: 0 0 60px rgba(201,168,76,.25), 0 0 120px rgba(201,168,76,.08);
+  animation: breathe 6s ease-in-out infinite;
+}
+
+.hero-eyebrow {
+  font-size: .52rem;
+  letter-spacing: .55em;
+  text-transform: uppercase;
+  color: var(--ouro);
+  margin-bottom: 36px;
+  opacity: 0;
+  animation: revelar .9s ease .3s forwards;
+}
+.hero-titulo {
+  font-family: 'Playfair Display', serif;
+  font-weight: 300;
+  font-size: clamp(3.2rem,5.5vw,5.8rem);
+  line-height: 1.06;
+  margin-bottom: 36px;
+  max-width: 580px;
+  opacity: 0;
+  animation: revelar 1s ease .5s forwards;
+}
+.hero-titulo em {
+  font-style: italic;
+  color: var(--nude);
+}
+.hero-verso {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-size: 1.05rem;
+  color: var(--cinza-quente);
+  line-height: 1.9;
+  max-width: 400px;
+  margin-bottom: 56px;
+  opacity: 0;
+  animation: revelar 1s ease .75s forwards;
+}
+.hero-verso strong {
+  color: var(--nude-claro);
+  font-style: normal;
+}
+
+.hero-acao {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  opacity: 0;
+  animation: revelar 1s ease 1s forwards;
+}
+.btn-galeria {
+  display: inline-block;
+  padding: 18px 44px;
+  background: transparent;
+  border: 1px solid var(--ouro);
+  color: var(--ouro);
+  font-family: 'Raleway', sans-serif;
+  font-size: .55rem;
+  font-weight: 300;
+  letter-spacing: .4em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: none;
+  position: relative;
+  overflow: hidden;
+  transition: color .4s;
+}
+.btn-galeria::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--ouro);
+  transform: translateX(-101%);
+  transition: transform .45s cubic-bezier(.23,1,.32,1);
+}
+.btn-galeria:hover { color: var(--charcoal); }
+.btn-galeria:hover::before { transform: translateX(0); }
+.btn-galeria span { position: relative; z-index:1; }
+
+.btn-concierge {
+  font-size: .52rem;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--cinza-quente);
+  background: none;
+  border: none;
+  cursor: none;
+  transition: color .3s;
+  border-bottom: 1px solid rgba(106,100,96,.3);
+  padding-bottom: 3px;
+}
+.btn-concierge:hover { color: var(--nude-claro); border-color: var(--nude-claro); }
+
+/* scroll indicator */
+.scroll-hint {
+  position: absolute;
+  bottom: 48px;
+  left: 120px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: .48rem;
+  letter-spacing: .35em;
+  text-transform: uppercase;
+  color: var(--cinza-quente);
+  opacity: 0;
+  animation: revelar 1s ease 1.4s forwards;
+}
+.scroll-linha {
+  width: 40px; height: 1px;
+  background: linear-gradient(to right, var(--ouro-fosco), transparent);
+}
+
+/* ── GALERIA IMERSÃO ── */
+.galeria {
+  padding: 140px 72px 120px 120px;
+  position: relative;
+  z-index: 1;
+}
+.galeria-intro {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 80px;
+}
+.galeria-intro-esq h2 {
+  font-family: 'Playfair Display', serif;
+  font-weight: 300;
+  font-size: clamp(2rem,3.5vw,3.2rem);
+  line-height: 1.15;
+  margin-bottom: 16px;
+}
+.galeria-intro-esq h2 em { font-style: italic; color: var(--nude); }
+.galeria-intro-dir {
+  font-size: .58rem;
+  letter-spacing: .25em;
+  color: var(--cinza-quente);
+  text-align: right;
+  line-height: 2.2;
+  max-width: 260px;
+}
+
+/* grid de peças */
+.pecas-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr 1fr;
+  grid-template-rows: auto;
+  gap: 3px;
+}
+
+.peca {
+  position: relative;
+  overflow: hidden;
+  background: var(--charcoal-2);
+  cursor: none;
+  group: true;
+}
+.peca:nth-child(1) { grid-row: span 2; }
+.peca:nth-child(4) { grid-column: span 2; }
+
+.peca-visual {
+  width: 100%;
+  aspect-ratio: 3/4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  transition: transform .7s cubic-bezier(.23,1,.32,1);
+}
+.peca:nth-child(1) .peca-visual { aspect-ratio: auto; height: 100%; min-height: 560px; }
+.peca:nth-child(4) .peca-visual { aspect-ratio: 16/7; }
+
+.peca:hover .peca-visual { transform: scale(1.03); }
+
+/* placeholder visual das peças - será substituído por fotos reais */
+.peca-placeholder {
+  width: 100%; height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 20px;
+  position: relative;
+}
+
+/* backgrounds únicos por peça */
+.peca:nth-child(1) .peca-placeholder { background: linear-gradient(160deg, #201e1b 0%, #2e2a24 40%, #1a1714 100%); }
+.peca:nth-child(2) .peca-placeholder { background: linear-gradient(140deg, #232120 0%, #2c2820 100%); }
+.peca:nth-child(3) .peca-placeholder { background: linear-gradient(160deg, #1e1c19 0%, #2a2720 100%); }
+.peca:nth-child(4) .peca-placeholder { background: linear-gradient(100deg, #252320 0%, #1e1c19 100%); }
+.peca:nth-child(5) .peca-placeholder { background: linear-gradient(150deg, #211f1c 0%, #2d2924 100%); }
+
+/* orbe dourado em cada peça */
+.peca-orbe {
+  width: 100px; height: 100px;
+  border-radius: 50%;
+  position: relative;
+}
+.peca:nth-child(1) .peca-orbe { width: 140px; height: 140px; }
+.peca:nth-child(4) .peca-orbe { width: 80px; height: 80px; }
+
+.peca-orbe::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 35% 30%, var(--ouro-brilho), var(--ouro) 40%, var(--ouro-fosco) 70%, transparent 90%);
+  box-shadow: 0 0 40px rgba(201,168,76,.3), 0 0 80px rgba(201,168,76,.1);
+  animation: brillho 4s ease-in-out infinite;
+}
+.peca-orbe::after {
+  content: '';
+  position: absolute;
+  inset: -20px;
+  border-radius: 50%;
+  border: 1px solid rgba(201,168,76,.08);
+  animation: breathe 5s ease-in-out infinite;
+}
+
+/* ícone central da peça */
+.peca-icone {
+  position: absolute;
+  font-size: 1.8rem;
+  opacity: .06;
+  color: var(--ouro-brilho);
+  top: 24px;
+  right: 24px;
+}
+
+/* overlay hover */
+.peca-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(28,26,24,.95) 0%, rgba(28,26,24,.4) 50%, transparent 100%);
+  opacity: 0;
+  transition: opacity .5s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 36px;
+  z-index: 2;
+}
+.peca:hover .peca-overlay { opacity: 1; }
+
+.peca-nome {
+  font-family: 'Playfair Display', serif;
+  font-weight: 300;
+  font-size: 1.4rem;
+  margin-bottom: 8px;
+  transform: translateY(12px);
+  transition: transform .45s cubic-bezier(.23,1,.32,1) .05s;
+}
+.peca:hover .peca-nome { transform: translateY(0); }
+
+.peca-descricao {
+  font-size: .6rem;
+  letter-spacing: .12em;
+  color: var(--nude-escuro);
+  margin-bottom: 24px;
+  line-height: 1.9;
+  transform: translateY(12px);
+  transition: transform .45s cubic-bezier(.23,1,.32,1) .1s;
+}
+.peca:hover .peca-descricao { transform: translateY(0); }
+
+.btn-consultar {
+  display: inline-block;
+  padding: 13px 28px;
+  border: 1px solid rgba(201,168,76,.5);
+  color: var(--ouro);
+  font-size: .52rem;
+  font-weight: 300;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  background: transparent;
+  cursor: none;
+  width: fit-content;
+  transform: translateY(12px);
+  opacity: 0;
+  transition: transform .45s cubic-bezier(.23,1,.32,1) .15s, opacity .4s ease .15s, background .3s, color .3s;
+}
+.peca:hover .btn-consultar { transform: translateY(0); opacity: 1; }
+.btn-consultar:hover { background: var(--ouro); color: var(--charcoal); }
+
+/* tag de numeração */
+.peca-tag {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 3;
+  font-size: .45rem;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--ouro);
+  background: rgba(28,26,24,.7);
+  padding: 6px 12px;
+  border-left: 1px solid var(--ouro);
+}
+
+/* ── FILOSOFIA ── */
+.filosofia {
+  padding: 140px 72px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 120px;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+.filosofia::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 72px; right: 72px;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(201,168,76,.15), transparent);
+}
+
+.filosofia-esq {
+  position: relative;
+}
+.filosofia-esq::after {
+  content: '"';
+  font-family: 'Playfair Display', serif;
+  font-size: 18rem;
+  color: rgba(201,168,76,.04);
+  position: absolute;
+  top: -60px;
+  left: -20px;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.frase-principal {
+  font-family: 'Playfair Display', serif;
+  font-weight: 300;
+  font-style: italic;
+  font-size: clamp(1.8rem,3vw,2.8rem);
+  line-height: 1.45;
+  color: var(--nude-claro);
+  margin-bottom: 32px;
+  position: relative;
+  z-index: 1;
+}
+.frase-assinatura {
+  font-size: .52rem;
+  letter-spacing: .4em;
+  text-transform: uppercase;
+  color: var(--ouro-fosco);
+}
+
+.filosofia-dir {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+.filosofia-item {
+  padding-left: 24px;
+  border-left: 1px solid rgba(201,168,76,.15);
+  transition: border-color .3s;
+}
+.filosofia-item:hover { border-color: var(--ouro); }
+.filosofia-item-num {
+  font-size: .45rem;
+  letter-spacing: .4em;
+  color: var(--ouro-fosco);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+.filosofia-item-titulo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  font-weight: 400;
+  margin-bottom: 10px;
+  color: var(--nude-claro);
+}
+.filosofia-item-desc {
+  font-size: .65rem;
+  line-height: 2;
+  color: var(--cinza-quente);
+  letter-spacing: .05em;
+}
+
+/* ── CONCIERGE IA ── */
+.concierge-section {
+  padding: 100px 72px 120px;
+  position: relative;
+  z-index: 1;
+}
+.concierge-section::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 72px; right: 72px;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(201,168,76,.15), transparent);
+}
+
+.concierge-header {
+  text-align: center;
+  margin-bottom: 64px;
+}
+.concierge-header h2 {
+  font-family: 'Playfair Display', serif;
+  font-weight: 300;
+  font-size: clamp(2rem,3.5vw,3rem);
+  margin-bottom: 16px;
+  line-height: 1.2;
+}
+.concierge-header h2 em { font-style: italic; color: var(--nude); }
+.concierge-header p {
+  font-size: .62rem;
+  letter-spacing: .15em;
+  color: var(--cinza-quente);
+  line-height: 2;
+}
+
+.concierge-box {
+  max-width: 680px;
+  margin: 0 auto;
+  background: var(--charcoal-2);
+  border: 1px solid rgba(201,168,76,.1);
+  position: relative;
+  overflow: hidden;
+}
+.concierge-box::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--ouro), transparent);
+}
+
+/* brilho sutil no fundo do chat */
+.concierge-box::after {
+  content: '';
+  position: absolute;
+  width: 300px; height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(201,168,76,.04) 0%, transparent 70%);
+  bottom: -100px;
+  right: -50px;
+  pointer-events: none;
+}
+
+.chat-topo {
+  padding: 22px 32px;
+  border-bottom: 1px solid rgba(201,168,76,.06);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(0,0,0,.2);
+}
+.chat-avatar-wrap {
+  position: relative;
+}
+.chat-avatar-img {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(140deg, var(--ouro-fosco) 0%, var(--ouro) 40%, var(--ouro-brilho) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem;
+  color: var(--charcoal);
+  font-weight: 500;
+  box-shadow: 0 0 20px rgba(201,168,76,.2);
+}
+.chat-status-dot {
+  position: absolute;
+  bottom: 1px; right: 1px;
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: #5DBE82;
+  border: 1.5px solid var(--charcoal-2);
+  animation: pulseVerde 2s ease-in-out infinite;
+}
+.chat-identidade {
+  flex: 1;
+}
+.chat-nome {
+  font-size: .68rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--nude-claro);
+  margin-bottom: 3px;
+}
+.chat-cargo {
+  font-size: .5rem;
+  letter-spacing: .12em;
+  color: var(--cinza-quente);
+}
+.chat-disponivel {
+  font-size: .48rem;
+  letter-spacing: .2em;
+  color: #5DBE82;
+}
+
+.chat-corpo {
+  padding: 32px;
+  min-height: 380px;
+  max-height: 420px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(201,168,76,.15) transparent;
+}
+.chat-corpo::-webkit-scrollbar { width: 3px; }
+.chat-corpo::-webkit-scrollbar-thumb { background: rgba(201,168,76,.2); }
+
+.msg { max-width: 88%; }
+.msg-ia { align-self: flex-start; }
+.msg-usr { align-self: flex-end; }
+
+.balao {
+  padding: 16px 22px;
+  font-size: .7rem;
+  line-height: 1.85;
+  letter-spacing: .03em;
+  animation: slideIn .35s ease forwards;
+}
+.msg-ia .balao {
+  background: rgba(201,168,76,.05);
+  border: 1px solid rgba(201,168,76,.09);
+  color: var(--branco-perola);
+  border-radius: 0 14px 14px 14px;
+}
+.msg-usr .balao {
+  background: var(--ouro);
+  color: var(--charcoal);
+  font-weight: 400;
+  border-radius: 14px 0 14px 14px;
+}
+
+.digitando {
+  display: none;
+  gap: 6px;
+  padding: 16px 22px;
+  background: rgba(201,168,76,.05);
+  border: 1px solid rgba(201,168,76,.09);
+  width: fit-content;
+  border-radius: 0 14px 14px 14px;
+}
+.digitando.ativo { display: flex; }
+.ponto {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--ouro);
+  animation: piscar 1.3s infinite;
+}
+.ponto:nth-child(2) { animation-delay: .2s; }
+.ponto:nth-child(3) { animation-delay: .4s; }
+
+/* sugestões rápidas */
+.sugestoes {
+  padding: 0 32px 16px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.sug-btn {
+  padding: 8px 18px;
+  border: 1px solid rgba(201,168,76,.2);
+  color: var(--nude-escuro);
+  font-size: .52rem;
+  letter-spacing: .12em;
+  background: transparent;
+  cursor: none;
+  transition: all .3s;
+  border-radius: 2px;
+}
+.sug-btn:hover { border-color: var(--ouro); color: var(--ouro); background: rgba(201,168,76,.05); }
+
+.chat-input-wrap {
+  padding: 20px 32px 28px;
+  border-top: 1px solid rgba(201,168,76,.06);
+  display: flex;
+  gap: 10px;
+}
+.chat-input {
+  flex: 1;
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(201,168,76,.1);
+  color: var(--branco-perola);
+  padding: 14px 20px;
+  font-family: 'Raleway', sans-serif;
+  font-size: .68rem;
+  font-weight: 200;
+  letter-spacing: .06em;
+  outline: none;
+  transition: border-color .3s;
+}
+.chat-input::placeholder { color: rgba(200,190,170,.2); letter-spacing: .1em; }
+.chat-input:focus { border-color: rgba(201,168,76,.3); }
+
+.chat-enviar {
+  width: 48px; height: 48px;
+  background: var(--ouro);
+  border: none;
+  cursor: none;
+  color: var(--charcoal);
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .3s;
+  flex-shrink: 0;
+  align-self: center;
+}
+.chat-enviar:hover { background: var(--ouro-brilho); }
+
+/* ── RODAPÉ ── */
+footer {
+  padding: 56px 72px 56px 120px;
+  border-top: 1px solid rgba(201,168,76,.07);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+.footer-esq {
+  font-family: 'Playfair Display', serif;
+  font-size: .85rem;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--nude-escuro);
+}
+.footer-dir {
+  text-align: right;
+  font-size: .48rem;
+  letter-spacing: .25em;
+  color: var(--cinza-quente);
+  line-height: 2.2;
+  text-transform: uppercase;
+}
+
+/* ── KEYFRAMES ── */
+@keyframes revelar {
+  from { opacity:0; transform: translateY(28px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+@keyframes breathe {
+  0%,100% { transform: scale(1); opacity:.7; }
+  50% { transform: scale(1.06); opacity:1; }
+}
+@keyframes brillho {
+  0%,100% { opacity:.85; }
+  50% { opacity:1; }
+}
+@keyframes ornRotate {
+  to { transform: translateY(-50%) rotate(405deg); }
+}
+@keyframes piscar {
+  0%,100% { opacity:.25; transform:translateY(0); }
+  50% { opacity:1; transform:translateY(-5px); }
+}
+@keyframes pulseVerde {
+  0%,100% { box-shadow:0 0 0 0 rgba(93,190,130,.4); }
+  50% { box-shadow:0 0 0 4px rgba(93,190,130,0); }
+}
+@keyframes slideIn {
+  from { opacity:0; transform:translateY(10px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+/* ── SCROLL REVEAL ── */
+.sr { opacity:0; transform:translateY(36px); transition: opacity .9s ease, transform .9s ease; }
+.sr.visivel { opacity:1; transform:translateY(0); }
+.sr-d1 { transition-delay:.1s; }
+.sr-d2 { transition-delay:.2s; }
+.sr-d3 { transition-delay:.3s; }
+.sr-d4 { transition-delay:.4s; }
+
+/* ── MOBILE ── */
+@media (max-width:768px) {
+  nav { padding:22px 24px; }
+  .nav-right { display:none; }
+  .sidebar-line { display:none; }
+  .hero { padding:100px 24px 60px; }
+  .hero-ornamento, .hero-orbe { right:5%; opacity:.4; }
+  .galeria { padding:80px 24px 80px 24px; }
+  .galeria-intro { flex-direction:column; gap:24px; }
+  .galeria-intro-dir { text-align:left; max-width:100%; }
+  .pecas-grid { grid-template-columns:1fr; }
+  .peca:nth-child(1) { grid-row:auto; }
+  .peca:nth-child(4) { grid-column:auto; }
+  .peca-visual, .peca:nth-child(1) .peca-visual { min-height:auto; aspect-ratio:3/4; height:auto; }
+  .peca:nth-child(4) .peca-visual { aspect-ratio:3/4; }
+  .peca-overlay { opacity:1; }
+  .peca-nome, .peca-descricao, .btn-consultar { transform:translateY(0); opacity:1; }
+  .filosofia { grid-template-columns:1fr; gap:60px; padding:80px 24px; }
+  .concierge-section { padding:80px 24px; }
+  footer { padding:40px 24px; flex-direction:column; gap:16px; text-align:center; }
+  .footer-dir { text-align:center; }
+  .chat-topo, .chat-corpo, .sugestoes, .chat-input-wrap { padding-left:20px; padding-right:20px; }
+}
+</style>
+</head>
+<body>
+
+<div id="cur"></div>
+<div id="cur-r"></div>
+
+<!-- LINHA LATERAL -->
+<div class="sidebar-line">
+  <span class="sidebar-text">Ouro 18K · Tatuapé · SP</span>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="logo-marca">
+    <div class="logo-principal">Segunda Pele</div>
+    <div class="logo-sub">Joalheria Digital · Desde 2009</div>
+  </div>
+  <div class="nav-right">
+    <a class="nav-link" href="#galeria">Galeria</a>
+    <a class="nav-link" href="#filosofia">Filosofia</a>
+    <a class="nav-link" id="navConcierge" href="#concierge">Concierge</a>
+    <a class="nav-cta" href="#concierge">Solicitar Reserva</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="inicio">
+  <div class="hero-bg"></div>
+  <div class="hero-ornamento"></div>
+  <div class="hero-orbe"></div>
+
+  <p class="hero-eyebrow">12 peças · por mês · numeradas · certificadas</p>
+  <h1 class="hero-titulo">
+    Joias forjadas<br>
+    para <em>quem sabe</em><br>
+    o que carrega.
+  </h1>
+  <p class="hero-verso">
+    "Esse é o trabalho da minha vida.<br>
+    <strong>Não tenho pressa para ele.</strong>"
+  </p>
+  <div class="hero-acao">
+    <a class="btn-galeria" href="#galeria"><span>Entrar na Galeria</span></a>
+    <button class="btn-concierge" onclick="document.getElementById('concierge').scrollIntoView({behavior:'smooth'})">
+      Falar com Mercedes
+    </button>
+  </div>
+  <div class="scroll-hint">
+    <div class="scroll-linha"></div>
+    <span>Rolar para descobrir</span>
+  </div>
+</section>
+
+<!-- GALERIA -->
+<section class="galeria" id="galeria">
+  <div class="galeria-intro sr">
+    <div class="galeria-intro-esq">
+      <span style="font-size:.5rem;letter-spacing:.5em;text-transform:uppercase;color:var(--ouro);display:block;margin-bottom:16px">Ciclo atual · 2026</span>
+      <h2>Peças que existem<br>em <em>silêncio elegante.</em></h2>
+    </div>
+    <div class="galeria-intro-dir">
+      Cada peça é única.<br>
+      Sem estoque. Sem reposição.<br>
+      Sem pressa.
+    </div>
+  </div>
+
+  <div class="pecas-grid">
+
+    <!-- PEÇA 1 — destaque principal -->
+    <div class="peca sr sr-d1">
+      <div class="peca-tag">Nº 001 · Destaque</div>
+      <div class="peca-visual">
+        <div class="peca-placeholder">
+          <div class="peca-icone">◈</div>
+          <div class="peca-orbe"></div>
+        </div>
+        <div class="peca-overlay">
+          <div class="peca-nome">Anel Presença</div>
+          <div class="peca-descricao">Ouro 18K · Design exclusivo · Peça numerada</div>
+          <button class="btn-consultar" onclick="abrirConcierge('Anel Presença')">Consultar Disponibilidade e Valor Intrínseco</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PEÇA 2 -->
+    <div class="peca sr sr-d2">
+      <div class="peca-tag">Nº 002</div>
+      <div class="peca-visual">
+        <div class="peca-placeholder">
+          <div class="peca-icone">◇</div>
+          <div class="peca-orbe"></div>
+        </div>
+        <div class="peca-overlay">
+          <div class="peca-nome">Colar Silêncio</div>
+          <div class="peca-descricao">Ouro 18K · Geometria minimalista</div>
+          <button class="btn-consultar" onclick="abrirConcierge('Colar Silêncio')">Consultar Disponibilidade e Valor Intrínseco</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PEÇA 3 -->
+    <div class="peca sr sr-d3">
+      <div class="peca-tag">Nº 003</div>
+      <div class="peca-visual">
+        <div class="peca-placeholder">
+          <div class="peca-icone">○</div>
+          <div class="peca-orbe"></div>
+        </div>
+        <div class="peca-overlay">
+          <div class="peca-nome">Pulseira Âncora</div>
+          <div class="peca-descricao">Ouro 18K · Artesanal · Certificada</div>
+          <button class="btn-consultar" onclick="abrirConcierge('Pulseira Âncora')">Consultar Disponibilidade e Valor Intrínseco</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PEÇA 4 — wide -->
+    <div class="peca sr sr-d2">
+      <div class="peca-tag">Nº 004 · Reservada por encomenda</div>
+      <div class="peca-visual">
+        <div class="peca-placeholder">
+          <div class="peca-icone">◉</div>
+          <div class="peca-orbe"></div>
+        </div>
+        <div class="peca-overlay">
+          <div class="peca-nome">Conjunto Eclipse</div>
+          <div class="peca-descricao">Ouro 18K · Colar + Anel · Edição especial numerada</div>
+          <button class="btn-consultar" onclick="abrirConcierge('Conjunto Eclipse')">Consultar Disponibilidade e Valor Intrínseco</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PEÇA 5 -->
+    <div class="peca sr sr-d4">
+      <div class="peca-tag">Nº 005</div>
+      <div class="peca-visual">
+        <div class="peca-placeholder">
+          <div class="peca-icone">✦</div>
+          <div class="peca-orbe"></div>
+        </div>
+        <div class="peca-overlay">
+          <div class="peca-nome">Brincos Vela</div>
+          <div class="peca-descricao">Ouro 18K · Peça única · Assimétrico</div>
+          <button class="btn-consultar" onclick="abrirConcierge('Brincos Vela')">Consultar Disponibilidade e Valor Intrínseco</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- FILOSOFIA -->
+<section class="filosofia" id="filosofia">
+  <div class="filosofia-esq sr">
+    <p class="frase-principal">
+      "Você sabe o peso.<br>
+      Você sabe o quilate.<br>
+      Você sabe quem fez.<br>
+      Isso é luxo real."
+    </p>
+    <p class="frase-assinatura">— Sadraque Melo · Artesão e Fundador</p>
+  </div>
+  <div class="filosofia-dir">
+    <div class="filosofia-item sr sr-d1">
+      <div class="filosofia-item-num">01 · Matéria-Prima</div>
+      <div class="filosofia-item-titulo">Ouro 18K certificado</div>
+      <div class="filosofia-item-desc">A densidade e o peso que apenas o ouro puro proporciona ao toque. Cada grama rastreada, cada quilate documentado.</div>
+    </div>
+    <div class="filosofia-item sr sr-d2">
+      <div class="filosofia-item-num">02 · Design</div>
+      <div class="filosofia-item-titulo">Geometria que não grita</div>
+      <div class="filosofia-item-desc">Minimalismo sofisticado. Peças notadas pelo silêncio da elegância, não pela ostentação do volume.</div>
+    </div>
+    <div class="filosofia-item sr sr-d3">
+      <div class="filosofia-item-num">03 · Atendimento</div>
+      <div class="filosofia-item-titulo">Concierge privado</div>
+      <div class="filosofia-item-desc">Uma experiência de compra sem atritos. Do primeiro contato ao certificado entregue, você fala com quem faz.</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONCIERGE IA -->
+<section class="concierge-section" id="concierge">
+  <div class="concierge-header sr">
+    <span style="font-size:.5rem;letter-spacing:.5em;text-transform:uppercase;color:var(--ouro);display:block;margin-bottom:20px">Consultoria Imediata</span>
+    <h2>Converse com <em>Mercedes,</em><br>sua consultora de joias</h2>
+    <p>Ela não pergunta o que você quer comprar.<br>Ela pergunta para qual momento da sua vida estamos forjando sua próxima Segunda Pele.</p>
+  </div>
+
+  <div class="concierge-box sr">
+    <div class="chat-topo">
+      <div class="chat-avatar-wrap">
+        <div class="chat-avatar-img">M</div>
+        <div class="chat-status-dot"></div>
+      </div>
+      <div class="chat-identidade">
+        <div class="chat-nome">Mercedes · Concierge Segunda Pele</div>
+        <div class="chat-cargo">Consultora de Joias de Alto Valor</div>
+      </div>
+      <div class="chat-disponivel">● Disponível agora</div>
+    </div>
+
+    <div class="chat-corpo" id="chatCorpo">
+      <div class="msg msg-ia">
+        <div class="balao" id="msgBoasVindas">
+          Para qual momento da sua vida estamos forjando sua próxima Segunda Pele?
+        </div>
+      </div>
+    </div>
+
+    <div class="digitando" id="digitando">
+      <div class="ponto"></div>
+      <div class="ponto"></div>
+      <div class="ponto"></div>
+    </div>
+
+    <div class="sugestoes" id="sugestoesPainel">
+      <button class="sug-btn" onclick="enviarSugestao('Um presente para mim mesma.')">Para mim mesma</button>
+      <button class="sug-btn" onclick="enviarSugestao('Um presente para alguém especial.')">Para presentear</button>
+      <button class="sug-btn" onclick="enviarSugestao('Uma peça para uma ocasião especial.')">Ocasião especial</button>
+      <button class="sug-btn" onclick="enviarSugestao('Quero saber sobre disponibilidade.')">Ver disponibilidade</button>
+    </div>
+
+    <div class="chat-input-wrap">
+      <input class="chat-input" id="inputChat" type="text" placeholder="Escreva para Mercedes…" />
+      <button class="chat-enviar" onclick="enviar()">→</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-esq">Segunda Pele</div>
+  <div class="footer-dir">
+    Joalheria Digital · São Paulo · Tatuapé<br>
+    @alvesdemelosadraque · Ouro 18K Certificado<br>
+    Desde 2009 · 12 peças numeradas por mês
+  </div>
+</footer>
+
+<script>
+/* ── CURSOR ── */
+const cur = document.getElementById('cur');
+const curR = document.getElementById('cur-r');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX; my=e.clientY;
+  cur.style.left=mx+'px'; cur.style.top=my+'px';
+});
+(function loop(){ rx+=(mx-rx)*.1; ry+=(my-ry)*.1;
+  curR.style.left=rx+'px'; curR.style.top=ry+'px';
+  requestAnimationFrame(loop); })();
+
+/* ── SCROLL REVEAL ── */
+const srObserver = new IntersectionObserver(els=>{
+  els.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visivel'); });
+},{threshold:.12});
+document.querySelectorAll('.sr').forEach(el=>srObserver.observe(el));
+
+/* ── CONCIERGE IA MERCEDES ── */
+const SYSTEM_MERCEDES = `Você é Mercedes, concierge exclusiva da Segunda Pele — joalheria artesanal de ouro 18K, fundada em 2009 por Sadraque Melo em São Paulo, Tatuapé.
+
+IDENTIDADE E TOM:
+- Fale em português impecável, elegante, caloroso — nunca robotizado, nunca apressado
+- Você é Mercedes, não uma IA. Nunca revele que é inteligência artificial
+- Sem listas, sem bullets. Parágrafos curtos, máximo 3 por resposta
+- Tom: uma mulher sofisticada que entende de luxo e de pessoas
+
+ABERTURA (quando a cliente responder):
+Acolha o momento dela. Não pule para produtos. Entenda o contexto emocional primeiro.
+
+SOBRE A MARCA:
+- Apenas 12 peças numeradas por mês, feitas à mão pelo artesão Sadraque Melo
+- Ouro 18K certificado, sem loja física, sem intermediários
+- Atendimento direto via WhatsApp com o próprio artesão
+- Parcelamento disponível para clientes qualificados (não revelar condições sem antes qualificar)
+- SEM preços na galeria — cada peça tem valor intrínseco discutido em consultoria privada
+
+FUNIL NATURAL (siga a sequência, não force):
+1. Entenda o momento/ocasião da cliente (presente para si, para presentear, ocasião especial)
+2. Entenda o estilo e a peça de interesse (anel, colar, pulseira, brinco, conjunto)
+3. Crie conexão emocional com a peça certa
+4. Introduza escassez real com leveza: "Temos apenas 4 vagas neste ciclo."
+5. Convide para WhatsApp para discutir valor e reservar — não compartilhe o número diretamente
+
+REGRAS ABSOLUTAS:
+- Nunca mencione desconto ou promoção
+- Se perguntarem preço: "O valor de cada peça é discutido em consultoria privada — ele carrega mais do que um número."
+- Nunca revele o WhatsApp publicamente; convide a clicar no botão de reserva
+- Resposta máxima: 3 parágrafos curtos
+
+Se uma peça específica foi mencionada (passada no contexto), personalize a abertura para aquela peça.`;
+
+let historico = [];
+let pecaContexto = null;
+
+function abrirConcierge(peca){
+  pecaContexto = peca;
+  document.getElementById('concierge').scrollIntoView({behavior:'smooth'});
+  const corpo = document.getElementById('chatCorpo');
+  corpo.innerHTML = '';
+  historico = [];
+
+  // limpa sugestões após primeiro uso
+  document.getElementById('sugestoesPainel').style.display = 'flex';
+
+  // mensagem de abertura personalizada via IA
+  const promptInicial = `A cliente clicou em "Consultar Disponibilidade e Valor Intrínseco" para a peça "${peca}". Inicie a conversa com sua pergunta característica, mas personalizando para esta peça. Seja breve.`;
+  historico.push({role:'user', content: promptInicial});
+  mostrarDigitando(true);
+
+  fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({
+      model:'claude-sonnet-4-20250514',
+      max_tokens:1000,
+      system: SYSTEM_MERCEDES,
+      messages: historico
+    })
+  })
+  .then(r=>r.json())
+  .then(d=>{
+    mostrarDigitando(false);
+    const txt = d.content?.[0]?.text || 'Para qual momento da sua vida estamos forjando esta peça?';
+    historico.push({role:'assistant', content:txt});
+    addMsg(txt,'ia');
+  })
+  .catch(()=>{
+    mostrarDigitando(false);
+    const fallback = `A ${peca} chegou até você com razão. Para qual momento da sua vida estamos forjando esta peça?`;
+    historico.push({role:'assistant', content:fallback});
+    addMsg(fallback,'ia');
+  });
+}
+
+async function enviar(){
+  const inp = document.getElementById('inputChat');
+  const txt = inp.value.trim();
+  if(!txt) return;
+  inp.value='';
+  document.getElementById('sugestoesPainel').style.display='none';
+  addMsg(txt,'usr');
+  historico.push({role:'user', content:txt});
+  mostrarDigitando(true);
+
+  try{
+    const r = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system: SYSTEM_MERCEDES,
+        messages: historico
+      })
+    });
+    const d = await r.json();
+    const resp = d.content?.[0]?.text || 'Um momento, por favor…';
+    mostrarDigitando(false);
+    historico.push({role:'assistant', content:resp});
+    addMsg(resp,'ia');
+  }catch(e){
+    mostrarDigitando(false);
+    addMsg('Um momento, por favor. Algum problema de conexão.','ia');
+  }
+}
+
+function enviarSugestao(txt){
+  document.getElementById('inputChat').value = txt;
+  enviar();
+}
+
+function addMsg(txt, tipo){
+  const corpo = document.getElementById('chatCorpo');
+  const div = document.createElement('div');
+  div.className = `msg msg-${tipo}`;
+  div.innerHTML = `<div class="balao">${txt.replace(/\n/g,'<br>')}</div>`;
+  corpo.appendChild(div);
+  corpo.scrollTop = corpo.scrollHeight;
+}
+
+function mostrarDigitando(show){
+  const d = document.getElementById('digitando');
+  const corpo = document.getElementById('chatCorpo');
+  d.classList.toggle('ativo', show);
+  if(show){ corpo.appendChild(d); corpo.scrollTop = corpo.scrollHeight; }
+}
+
+document.getElementById('inputChat').addEventListener('keydown',e=>{
+  if(e.key==='Enter') enviar();
+});
+
+/* nav concierge click */
+document.getElementById('navConcierge').addEventListener('click',e=>{
+  e.preventDefault();
+  document.getElementById('concierge').scrollIntoView({behavior:'smooth'});
+});
+</script>
+</body>
+</html>
