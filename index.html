@@ -816,27 +816,26 @@ async function sendMessage() {
   showTyping();
 
   try {
-    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    const res = await fetch('https//api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + GROQ_KEY
+       'x-api-key':ANTROPIC_KEY,
+        'anthropic-version':'2023-06-01'
       },
       body: JSON.stringify({
         model: MODEL,
         max_tokens: 1000,
-        messages: [
-          { role: 'system', content: SYSTEM_PROMPTS[currentMode] },
-          ...chatHistory
-        ]
+       system:SYSTEM_PROMPT[currentMode],
+        messages:chatHISTORY
       })
     });
 
     const data = await res.json();
     removeTyping();
 
-    if (data.choices && data.choices[0]) {
-      const reply = data.choices[0].message.content;
+    if (data.content && data.content[0]) {
+      const reply = data.cotent[0].tex;
       chatHistory.push({ role: 'assistant', content: reply });
       addMsg('jarves', reply);
     } else {
@@ -855,27 +854,26 @@ async function generateScript(type) {
   overlay.classList.add('active');
 
   try {
-    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + GROQ_KEY
+        'x-api-key':ANTHROPIC_KEY,
+        'anthropic-version':'2023-06-01'
       },
       body: JSON.stringify({
         model: MODEL,
         max_tokens: 1000,
-        messages: [
-          { role: 'system', content: SYSTEM_PROMPTS.vendas },
-          { role: 'user', content: SCRIPT_PROMPTS[type] }
-        ]
+        system:SYSTEM_PROMPTS.vendas,
+        messages:[{role:'user',content:SCRIPT_PROMPT[type]}]
       })
     });
 
     const data = await res.json();
     overlay.classList.remove('active');
 
-    if (data.choices && data.choices[0]) {
-      const text = data.choices[0].message.content;
+    if (data.content && data.content[0]) {
+      const text = data.content[0].text;
       document.getElementById('scriptText').innerText = text;
       const out = document.getElementById('scriptOutput');
       out.classList.add('visible');
