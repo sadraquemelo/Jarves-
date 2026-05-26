@@ -22,4 +22,4 @@ export default async function handler(req, res) {
         max_tokens: 1000,                    // Número puro, sem aspas
         system,
         messages,
-      }),
+      })
