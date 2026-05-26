@@ -676,6 +676,7 @@ body::before{
 }
 </style>
 </head>
+
 <body>
 <div class="app">
 
@@ -1239,7 +1240,8 @@ function salvarConfig(){
 }
 
 /* ─────── ENGINE DE SCRIPTS ─────── */
-const SYSTEM_ENGINE = `Você é o motor criativo da Segunda Pele — joalheria artesanal de ouro 18K, São Paulo, fundada em 2009 por Sadraque Melo.
+const ANTHROPIC_API_KEY='sk-ant-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'; 
+SYSTEM_ENGINE = `Você é o motor criativo da Segunda Pele — joalheria artesanal de ouro 18K, São Paulo, fundada em 2009 por Sadraque Melo.
 
 MISSÃO: Gerar scripts de conteúdo para Instagram/TikTok com a narrativa "Luxo Silencioso".
 
@@ -1375,7 +1377,7 @@ Siga rigorosamente o formato correto para ${fmt}. Use o benchmark de tom como re
   try{
     const res = await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers:{'Content-Type':'application/json','x-api-key':ANTHROPIC_API_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
       body: JSON.stringify({
         model:'claude-sonnet-4-20250514',
         max_tokens:1000,
