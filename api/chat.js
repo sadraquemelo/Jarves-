@@ -22,6 +22,9 @@ export default async function handler(req, res) {
       })
     });
     
-    const data = await response.json();
-res.status(200).json(data);
-  }
+    body: JSON.stringify({
+        model: 'claude-3-5-sonnet-20241022', // Atualizado para o modelo real
+        max_tokens: 1000,                    // Número puro, sem aspas
+        system,
+        messages,
+      }),
