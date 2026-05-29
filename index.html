@@ -826,13 +826,7 @@ async function sendMessage() {
     messages: chatHISTORY
   })
 });
-      body: JSON.stringify({
-        model: MODEL,
-        max_tokens: 1000,
-       system:SYSTEM_PROMPT[currentMode],
-        messages:chatHISTORY
-      })
-    });
+     
 
     const data = await res.json();
     removeTyping();
