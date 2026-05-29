@@ -838,7 +838,7 @@ async function sendMessage() {
     removeTyping();
 
     if (data.content && data.content[0]) {
-      const reply = data.cotent[0].tex;
+      const reply = data.content[0].text;
       chatHistory.push({ role: 'assistant', content: reply });
       addMsg('jarves', reply);
     } else {
@@ -846,7 +846,7 @@ async function sendMessage() {
     }
   } catch (e) {
     removeTyping();
-    addMsg('jarves', 'Falha na conexão com o servidor Groq.');
+    addMsg('jarves', 'Erro na conexão. Tente novamente.');
   }
 
   btn.disabled = false;
