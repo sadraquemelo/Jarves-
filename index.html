@@ -852,20 +852,16 @@ async function generateScript(type) {
   overlay.classList.add('active');
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key':ANTHROPIC_KEY,
-        'anthropic-version':'2023-06-01'
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        max_tokens: 1000,
-        system:SYSTEM_PROMPTS.vendas,
-        messages:[{role:'user',content:SCRIPT_PROMPT[type]}]
-      })
-    });
+    const res = await fetch('https://sadraque-alves-de-melo-s-projects.vercel.app/api/chat', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    model: 'claude-sonnet-4-20250514',
+    max_tokens: 1000,
+    system: SYSTEM_PROMPTS.vendas,
+    messages: [{role: 'user', content: SCRIPT_PROMPT[type]}]
+  })
+});
 
     const data = await res.json();
     overlay.classList.remove('active');
