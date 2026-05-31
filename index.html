@@ -816,16 +816,17 @@ async function sendMessage() {
   showTyping();
 
   try {
-    const res = await fetch('/api/chat', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    model: 'claude-sonnet-4-20250514',
-    max_tokens: 1000,
-    system: SYSTEM_PROMPT[currentMode],
-    messages: chatHISTORY
-  })
-});
+    // Apontamento direto para o seu servidor back-end na Vercel
+    const res = await fetch('https://sadraque-alves-de-melo-s-projects.vercel.app/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 1000,
+            system: SYSTEM_PROMPT[currentMode],
+            messages: chatHISTORY
+        })
+    });
      
 
     const data = await res.json();
