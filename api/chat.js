@@ -17,14 +17,16 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         model: 'claude-3-5-haiku-20241022',
         max_tokens: 1024,
-        system: system || '',
+        system: system || "Você é o assistente da Segunda Pele.",
         messages: messages
       })
     });
     const data = await response.json();
-    const text = data.content?.[0]?.text || '';
-    return res.status(200).json({ content: [{ text }] });
-  } catch (e) {
-    return res.status(500).json({ error: e.message });
+    //Entrega o formato exato que o seu front-end espera ler na tela
+    return res.status(200).json({
+      content: [{ text:data.content[0].text }]
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
   }
 }
