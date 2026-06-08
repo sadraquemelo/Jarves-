@@ -1,4 +1,4 @@
-export default async function handler(req, res) {
+// v2 async function handler(req, res) {
   // Configuração rigorosa de CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
