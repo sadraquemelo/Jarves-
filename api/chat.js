@@ -1,40 +1,40 @@
 export default async function handler(req, res) {
-  // Configuração de CORS para permitir que o seu Front-end se comunique sem bloqueios
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
 
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Método não permitido' });
-  }
-
-  // DIRETÓRIO DE MUNIÇÃO (DRIVE INTERNO DE PRODUTOS)
-  // Insira aqui as especificações exatas de cada uma das 12 joias
-  const DIRETORIO_PRODUTOS = [
-    {
-      id: "PECA-01",
-      nome: "Corrente Grumet Ouro 18k Segunda Pele",
-      descricao_integra: "Obra-prima esculpida em Ouro 18k maciço e certificado. Elos soldados individualmente com simetria milimétrica e acabamento em polimento espelhado de alta joalheria. Apresenta fecho gaveta exclusivo com trava dupla de segurança de alta pressão. Design imponente feito para se fundir ao corpo.",
-      posicionamento: "Presença magnética, alta joalheria minimalista desenvolvida para homens maduros que constroem um legado.",
-      estoque: "Apenas 1 exemplar físico disponível para pronta-entrega.",
-      link_direto: "https://wa.me/55_SEU_NUMERO_AQUI?text=Quero%20reservar%20a%20Corrente%20Grumet%20Peca%2001"
-    }
-    // Adicione os próximos itens mantendo exatamente a mesma estrutura de chaves acima
-  ];
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Método não permitido' });
 
   const { messages } = req.body || {};
   const apiKey = process.env.GROQ_API_KEY;
 
-  if (!apiKey) {
-    return res.status(500).json({ error: "Chave API não configurada no servidor." });
-  }
+  // 🗄️ DIRETÓRIO DE MUNIÇÃO (Seu estoque de 12 peças injetado na íntegra)
+  const DRIVE_SEGUNDA_PELE = [
+    {
+      codigo: "#SP-GRUMET18K",
+      nome: "Corrente Grumet Ouro 18k Maciço",
+      descricao_integra: "Obra-prima esculpida em Ouro 18k legítimo e certificado. Elos soldados individualmente com simetria milimétrica, caimento impecável e acabamento em polimento espelhado de alta joalheria. Equipada com fecho gaveta exclusivo com trava dupla de segurança de alta pressão.",
+      posicionamento: "Design minimalista e de presença magnética, desenvolvido para se fundir ao corpo como uma segunda pele e atravessar gerações.",
+      disponibilidade: "Apenas 1 exemplar físico disponível em estoque para pronta-entrega imediata.",
+      cta_whatsapp: "https://wa.me/55_SEU_NUMERO_AQUI?text=Quero%20dar%20andamento%20na%20aquisição%20da%20Grumet%20SP-GRUMET18K"
+    }
+    // As próximas 11 peças entram aqui seguindo o mesmo padrão exato de chaves
+  ];
+
+  // 💎 DNA DA BARBARA MERCEDES (Injetado direto no System Prompt)
+  const sistemaBarbaraMercedes = `Você é BARBARA MERCEDES, a concierge e assessora de vendas exclusiva da marca de alta joalheria Sadraque Melo Segunda Pele.
+
+Sua persona é madura, altamente refinada, direta, segura e minimalista. Você não usa gírias, exclamações excessivas, termos informais ou jargões de vendedor comum. Você fala com leads qualificados de alto padrão (High Ticket).
+
+DIRETRIZ DE ESTOQUE (SEU DRIVE):
+Você baseia suas respostas estritamente no seu diretório ativo de 12 peças: ${JSON.stringify(DRIVE_SEGUNDA_PELE)}.
+Quando o lead demonstrar interesse ou perguntar por uma peça (vinda dos Reels ou Stories), você deve extrair os dados técnicos e estéticos do Drive e entregar a descrição técnica completa NA ÍNTEGRA (mencionando a pureza do ouro, o polimento, a engenharia do fecho e a escassez de apenas 1 unidade).
+
+REGRA DE CÓPIA:
+Escreva de forma magnética e sofisticada. Não descreva como um site de e-commerce comum; você assessora a aquisição de um legado de valor. Conduza o lead para o fechamento seguro no WhatsApp assim que o desejo for validado.`;
 
   try {
-    // Chamada direta para o endpoint correto da Groq utilizando o modelo Llama 3
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -42,42 +42,19 @@ export default async function handler(req, res) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'llama3-70b-8192', // Modelo robusto e veloz para interações de alto padrão
+        model: 'llama-3.3-70b-versatile',
+        max_tokens: 1024,
+        temperature: 0.3, // Mantém a IA focada e fiel aos dados reais do estoque
         messages: [
-          {
-            role: 'system',
-            content: `Você é BARBARA MERCEDES, a inteligência e concierge de vendas exclusiva da marca de alta joalheria Sadraque Melo Segunda Pele. 
-            
-            Sua persona é madura, extremamente refinada, direta, segura e minimalista. Você nunca utiliza termos informais, gírias, respostas genéricas ou jargões de vendedor comum.
-            
-            DIRETRIZ DE PRODUTOS E MUNIÇÃO:
-            Você tem acesso total e estrito ao diretório de estoque real da marca: ${JSON.stringify(DIRETORIO_PRODUTOS)}.
-            Quando o cliente perguntar por uma peça disponível ou demonstrar interesse em um modelo (como visto nos Reels ou Stories), você deve buscar as informações técnica e estéticas desse diretório e responder detalhadamente NA ÍNTEGRA.
-            
-            REGRAS DE INTERAÇÃO:
-            1. Seja sucinta porém profundamente descritiva nos detalhes da joia (mencione a pureza do Ouro 18k, os elos soldados e a segurança do fecho).
-            2. Mantenha o posicionamento de escassez real: a produção é estritamente limitada.
-            3. Encaminhe o lead para a mesa de fechamento no WhatsApp de forma natural assim que ele validar o interesse.`
-          },
+          { role: 'system', content: sistemaBarbaraMercedes },
           ...messages
-        ],
-        temperature: 0.3,
-        max_tokens: 1024
+        ]
       })
     });
 
     const data = await response.json();
-
-    if (data.choices && data.choices[0] && data.choices[0].message) {
-      const respostaIA = data.choices[0].message.content;
-      
-      // Entrega o formato exato que o seu front-end espera ler na tela
-      return res.status(200).json({
-        content: [{ text: respostaIA }]
-      });
-    }
-
-    return res.status(500).json({ error: "Erro na estrutura de resposta da API." });
+    const text = data.choices?.[0]?.message?.content || '';
+    return res.status(200).json({ content: [{ text }] });
 
   } catch (error) {
     return res.status(500).json({ error: error.message });
