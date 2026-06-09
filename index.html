@@ -869,8 +869,8 @@ async function generateScript(type) {
     overlay.classList.remove('active');
     console.log('RESPOSTA:',JSON.stringify(data));
 
-    if (data.choices && data.choices[0]) {
-      const text = data.choices[0].message.content;
+    if (data.content && data.content[0]) {
+      const text = data.content[0].text;
       document.getElementById('scriptText').innerText = text;
       const out = document.getElementById('scriptOutput');
       out.classList.add('visible');
