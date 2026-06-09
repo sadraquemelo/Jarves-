@@ -867,6 +867,7 @@ async function generateScript(type) {
 
     const data = await res.json();
     overlay.classList.remove('active');
+    console.log('RESPOSTA:',JSON.stringfy(data));
 
     if (data.choices && data.choices[0]) {
       const text = data.choices[0].message.content;
