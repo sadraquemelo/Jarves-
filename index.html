@@ -877,7 +877,8 @@ async function generateScript(type) {
     }
   } catch (e) {
     overlay.classList.remove('active');
-    alert('Erro de conexão com Groq.');
+    console.error('JARVES ERROR:',e);
+    alert('Erro de conexão com Groq.Detalhes:'+ emessage);
   }
 }
 
