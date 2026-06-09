@@ -858,16 +858,18 @@ async function generateScript(type) {
   body: JSON.stringify({
     model: 'llama-3.3-70b-versatile',
     max_tokens: 1000,
-    system: SYSTEM_PROMPTS.vendas,
-    messages: [{role: 'user', content: SCRIPT_PROMPT[type]}]
+    messages: [
+      {role:'system',content: SYSTEM_PROMPTS.vendas},
+    {role: 'user', content: SCRIPT_PROMPT[type]}
+    ]
   })
-});
+})
 
     const data = await res.json();
     overlay.classList.remove('active');
 
-    if (data.content && data.content[0]) {
-      const text = data.content[0].text;
+    if (data.choices && data.choices[0]) {
+      const text = data.choices[0].message.content;
       document.getElementById('scriptText').innerText = text;
       const out = document.getElementById('scriptOutput');
       out.classList.add('visible');
