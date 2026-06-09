@@ -860,7 +860,7 @@ async function generateScript(type) {
     max_tokens: 1000,
     messages: [
       {role:'system',content: SYSTEM_PROMPTS.vendas},
-    {role: 'user', content: SCRIPT_PROMPT[type]}
+    {role: 'user', content: SCRIPT_PROMPTS[type]}
     ]
   })
 })
