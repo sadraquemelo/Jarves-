@@ -722,7 +722,25 @@ Use os 7 princípios: luxo como presença, Efeito Rosenthal, reserva cognitiva o
 Formato de post: impacto emocional primeiro, contexto depois, call para ação nunca urgente — sempre elegante.
 Responda em português brasileiro.`
 };
+const SCRIPT_PROMPTS = {
+  comentario_dm: `Crie dois textos para a Segunda Pele joalheria:
+1. RESPOSTA PÚBLICA ao comentário de alguém que escreveu "RESERVA" ou "OURO
+" no Instagram. Curta, enigmática, direciona para DM.
+2. MENSAGEM DE DM direta. Mencione escassez real (12 peças/mês). Convide para reserva.`,
 
+  resgate_lead: `Crie 3 mensagens de reativação para lead que viu mas não comprou:
+Mensagem 1 (dia 3): interesse genuíno
+Mensagem 2 (dia 7): escassez real
+Mensagem 3 (dia 14): última oportunidade elegante`,
+
+  whatsapp_qualificacao: `Crie fluxo de 4 mensagens para qualificar leads no WhatsApp Business da Segunda Pele. Tom: atelier exclusivo, não formulário.`,
+
+  objecao_preco: `Crie 3 respostas elegantes para quando cliente questiona o preço. Reposicione como patrimônio, não custo. Nunca ofereça desconto.`,
+
+  story_escassez: `Crie 3 copies de story comunicando escassez real. Máximo 3 linhas cada. Direto. Elegante.`,
+
+  pos_venda: `Crie mensagem de pós-venda para enviar após entrega. Mencione número da peça (X de 12). Tom: carta de artesão.`
+};
 
 function setMode(btn, mode) {
   document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
