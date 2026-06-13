@@ -1,1511 +1,887 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jarves · Segunda Pele Command Center</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,300;1,300&display=swap" rel="stylesheet">
+<title>J.A.R.V.E.S. — Segunda Pele</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg:        #080A0C;
-  --bg2:       #0D1014;
-  --bg3:       #131820;
-  --ouro:      #C9A84C;
-  --ouro-v:    #E8C96A;
-  --ouro-s:    #7A6030;
-  --verde:     #1DB954;
-  --azul:      #4A90E2;
-  --vermelho:  #E25555;
-  --branco:    #EAE8E4;
-  --cinza:     #525A66;
-  --cinza-v:   #8A94A0;
-  --linha:     rgba(201,168,76,.08);
-  --glow:      rgba(201,168,76,.15);
-}
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8C97A;
+    --gold-dim: #7a6330;
+    --black: #080808;
+    --surface: #0f0f0f;
+    --surface2: #181818;
+    --surface3: #222222;
+    --text: #e8e0d0;
+    --text-dim: #7a7060;
+    --red: #c0392b;
+    --green: #27ae60;
+  }
 
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
-html{scroll-behavior:smooth;}
-body{
-  background:var(--bg);
-  color:var(--branco);
-  font-family:'Syne',sans-serif;
-  font-weight:300;
-  overflow-x:hidden;
-  min-height:100vh;
-}
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-/* GRAIN */
-body::after{
-  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-  opacity:.025;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
-}
+  body {
+    background: var(--black);
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
 
-/* SCAN LINES */
-body::before{
-  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.03) 2px,rgba(0,0,0,.03) 4px);
-}
+  /* GRID BACKGROUND */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(201,168,76,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(201,168,76,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
 
-/* ── LAYOUT GRID ── */
-.app{
-  display:grid;
-  grid-template-columns:220px 1fr;
-  min-height:100vh;
-  position:relative;
-  z-index:1;
-}
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 32px 20px;
+  }
 
-/* ── SIDEBAR ── */
-.sidebar{
-  background:var(--bg2);
-  border-right:1px solid var(--linha);
-  display:flex;
-  flex-direction:column;
-  position:sticky;
-  top:0;
-  height:100vh;
-  overflow:hidden;
-}
+  /* HEADER */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--gold-dim);
+  }
 
-.sidebar-logo{
-  padding:28px 24px 24px;
-  border-bottom:1px solid var(--linha);
-}
-.logo-sys{
-  font-family:'Space Mono',monospace;
-  font-size:.65rem;
-  color:var(--ouro);
-  letter-spacing:.15em;
-  margin-bottom:4px;
-}
-.logo-name{
-  font-family:'Playfair Display',serif;
-  font-style:italic;
-  font-size:1.1rem;
-  font-weight:300;
-  color:var(--branco);
-}
-.logo-status{
-  display:flex;
-  align-items:center;
-  gap:6px;
-  margin-top:8px;
-  font-family:'Space Mono',monospace;
-  font-size:.5rem;
-  color:var(--verde);
-}
-.dot-live{
-  width:5px;height:5px;border-radius:50%;background:var(--verde);
-  animation:pulseVerde 2s ease-in-out infinite;
-}
+  .brand {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
 
-.sidebar-nav{
-  flex:1;
-  padding:20px 0;
-  overflow-y:auto;
-}
-.nav-section{
-  padding:8px 20px 4px;
-  font-family:'Space Mono',monospace;
-  font-size:.42rem;
-  letter-spacing:.3em;
-  color:var(--cinza);
-  text-transform:uppercase;
-}
-.nav-item{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding:10px 20px;
-  font-size:.68rem;
-  color:var(--cinza-v);
-  cursor:pointer;
-  transition:all .2s;
-  border-left:2px solid transparent;
-  letter-spacing:.03em;
-}
-.nav-item:hover{color:var(--branco);background:rgba(255,255,255,.03);}
-.nav-item.ativo{color:var(--ouro);border-left-color:var(--ouro);background:rgba(201,168,76,.05);}
-.nav-icon{font-size:.8rem;width:16px;text-align:center;}
+  .brand-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    font-weight: 300;
+    letter-spacing: 6px;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+  }
 
-.sidebar-footer{
-  padding:16px 20px;
-  border-top:1px solid var(--linha);
-  font-family:'Space Mono',monospace;
-  font-size:.45rem;
-  color:var(--cinza);
-  line-height:1.8;
-}
+  .jarves-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 4px;
+  }
 
-/* ── MAIN ── */
-.main{
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
-}
+  .status-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--gold-dim);
+    padding: 8px 16px;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--gold);
+  }
 
-/* TOPBAR */
-.topbar{
-  padding:16px 32px;
-  border-bottom:1px solid var(--linha);
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  background:var(--bg2);
-  position:sticky;
-  top:0;
-  z-index:50;
-}
-.topbar-title{
-  font-size:.72rem;
-  letter-spacing:.2em;
-  text-transform:uppercase;
-  color:var(--cinza-v);
-}
-.topbar-title span{color:var(--ouro);}
-.topbar-right{
-  display:flex;
-  align-items:center;
-  gap:16px;
-}
-.badge{
-  padding:4px 10px;
-  background:rgba(201,168,76,.1);
-  border:1px solid rgba(201,168,76,.2);
-  color:var(--ouro);
-  font-family:'Space Mono',monospace;
-  font-size:.45rem;
-  letter-spacing:.1em;
-  border-radius:2px;
-}
+  .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green);
+    animation: pulse 2s infinite;
+  }
 
-/* ── CONTENT PANELS ── */
-.panel{
-  display:none;
-  padding:32px;
-  flex:1;
-  overflow-y:auto;
-  animation:fadeIn .3s ease;
-}
-.panel.ativo{display:flex;flex-direction:column;gap:28px;}
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
 
-/* SECTION HEADER */
-.sec-header{
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:20px;
-  flex-wrap:wrap;
-}
-.sec-titulo{
-  font-family:'Syne',sans-serif;
-  font-size:1.4rem;
-  font-weight:400;
-  line-height:1.2;
-  margin-bottom:6px;
-}
-.sec-titulo span{color:var(--ouro);}
-.sec-desc{
-  font-size:.62rem;
-  color:var(--cinza-v);
-  letter-spacing:.06em;
-  line-height:1.8;
-  max-width:520px;
-}
+  /* TABS */
+  .tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 32px;
+    border-bottom: 1px solid var(--surface3);
+  }
 
-/* CARDS GRID */
-.cards{
-  display:grid;
-  gap:2px;
-}
-.cards-2{grid-template-columns:1fr 1fr;}
-.cards-3{grid-template-columns:1fr 1fr 1fr;}
+  .tab {
+    padding: 12px 24px;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    cursor: pointer;
+    border: none;
+    background: none;
+    transition: all 0.2s;
+    position: relative;
+    font-family: 'Space Mono', monospace;
+  }
 
-.card{
-  background:var(--bg3);
-  border:1px solid var(--linha);
-  padding:24px;
-  position:relative;
-  overflow:hidden;
-  transition:border-color .3s;
-}
-.card:hover{border-color:rgba(201,168,76,.18);}
-.card::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:1px;
-  background:linear-gradient(to right,transparent,var(--ouro-s),transparent);
-  opacity:0;transition:opacity .3s;
-}
-.card:hover::before{opacity:1;}
+  .tab.active {
+    color: var(--gold);
+  }
 
-.card-label{
-  font-family:'Space Mono',monospace;
-  font-size:.45rem;
-  letter-spacing:.35em;
-  color:var(--cinza);
-  text-transform:uppercase;
-  margin-bottom:10px;
-}
-.card-value{
-  font-family:'Syne',sans-serif;
-  font-size:1.8rem;
-  font-weight:400;
-  color:var(--ouro);
-  line-height:1;
-  margin-bottom:6px;
-}
-.card-sub{
-  font-size:.58rem;
-  color:var(--cinza-v);
-  letter-spacing:.08em;
-}
+  .tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0; right: 0;
+    height: 1px;
+    background: var(--gold);
+  }
 
-/* ── ENGINE CONTEÚDO ── */
-.engine-grid{
-  display:grid;
-  grid-template-columns:1fr 1.4fr;
-  gap:2px;
-}
+  .tab:hover { color: var(--text); }
 
-.form-group{
-  margin-bottom:18px;
-}
-.form-label{
-  display:block;
-  font-family:'Space Mono',monospace;
-  font-size:.48rem;
-  letter-spacing:.25em;
-  color:var(--cinza-v);
-  text-transform:uppercase;
-  margin-bottom:8px;
-}
-.form-select,.form-input,.form-textarea{
-  width:100%;
-  background:rgba(255,255,255,.03);
-  border:1px solid rgba(255,255,255,.07);
-  color:var(--branco);
-  padding:12px 16px;
-  font-family:'Syne',sans-serif;
-  font-size:.68rem;
-  font-weight:300;
-  outline:none;
-  transition:border-color .3s;
-  appearance:none;
-  -webkit-appearance:none;
-}
-.form-select:focus,.form-input:focus,.form-textarea:focus{
-  border-color:rgba(201,168,76,.3);
-  background:rgba(201,168,76,.03);
-}
-.form-textarea{min-height:80px;resize:vertical;line-height:1.7;}
-.form-select option{background:var(--bg3);}
+  /* PANELS */
+  .panel { display: none; }
+  .panel.active { display: block; }
 
-.tags-grupo{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  margin-top:8px;
-}
-.tag-toggle{
-  padding:6px 14px;
-  border:1px solid rgba(255,255,255,.07);
-  color:var(--cinza-v);
-  font-size:.52rem;
-  letter-spacing:.1em;
-  cursor:pointer;
-  transition:all .2s;
-  background:transparent;
-  font-family:'Syne',sans-serif;
-}
-.tag-toggle:hover{border-color:var(--ouro);color:var(--ouro);}
-.tag-toggle.on{
-  background:rgba(201,168,76,.1);
-  border-color:var(--ouro);
-  color:var(--ouro);
-}
+  /* CHAT PANEL */
+  .chat-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
 
-.btn-gerar{
-  width:100%;
-  padding:16px;
-  background:var(--ouro);
-  color:var(--bg);
-  border:none;
-  font-family:'Syne',sans-serif;
-  font-size:.62rem;
-  font-weight:500;
-  letter-spacing:.25em;
-  text-transform:uppercase;
-  cursor:pointer;
-  transition:all .3s;
-  position:relative;
-  overflow:hidden;
-}
-.btn-gerar:hover{background:var(--ouro-v);}
-.btn-gerar:disabled{opacity:.5;cursor:not-allowed;}
+  .mode-selector {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
 
-.output-box{
-  background:var(--bg2);
-  border:1px solid var(--linha);
-  padding:28px;
-  min-height:400px;
-  display:flex;
-  flex-direction:column;
-  gap:0;
-  position:relative;
-}
-.output-header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  margin-bottom:20px;
-  padding-bottom:16px;
-  border-bottom:1px solid var(--linha);
-}
-.output-label{
-  font-family:'Space Mono',monospace;
-  font-size:.48rem;
-  letter-spacing:.3em;
-  color:var(--ouro);
-  text-transform:uppercase;
-}
-.output-actions{
-  display:flex;
-  gap:8px;
-}
-.btn-mini{
-  padding:5px 12px;
-  border:1px solid var(--linha);
-  background:transparent;
-  color:var(--cinza-v);
-  font-family:'Space Mono',monospace;
-  font-size:.42rem;
-  letter-spacing:.1em;
-  cursor:pointer;
-  transition:all .2s;
-}
-.btn-mini:hover{border-color:var(--ouro);color:var(--ouro);}
+  .mode-btn {
+    padding: 10px;
+    background: var(--surface2);
+    border: 1px solid var(--surface3);
+    color: var(--text-dim);
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Space Mono', monospace;
+    text-align: center;
+  }
 
-.output-content{
-  flex:1;
-  font-size:.72rem;
-  line-height:2;
-  color:var(--branco);
-  letter-spacing:.03em;
-  white-space:pre-wrap;
-  font-family:'Syne',sans-serif;
-  font-weight:300;
-}
-.output-content.vazio{
-  color:var(--cinza);
-  font-style:italic;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:.62rem;
-  letter-spacing:.15em;
-}
+  .mode-btn.active {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: rgba(201,168,76,0.05);
+  }
 
-/* streaming cursor */
-.cursor-stream{
-  display:inline-block;
-  width:2px;height:14px;
-  background:var(--ouro);
-  animation:blink .8s step-end infinite;
-  vertical-align:middle;
-  margin-left:2px;
-}
+  .chat-box {
+    background: var(--surface);
+    border: 1px solid var(--surface3);
+    height: 380px;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    scroll-behavior: smooth;
+  }
 
-/* ── AGENTE FLOW ── */
-.flow-grid{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:2px;
-}
-.etapa{
-  background:var(--bg3);
-  border:1px solid var(--linha);
-  padding:24px 20px;
-  position:relative;
-}
-.etapa::after{
-  content:'→';
-  position:absolute;
-  right:-14px;
-  top:50%;
-  transform:translateY(-50%);
-  color:var(--ouro-s);
-  font-size:1rem;
-  z-index:2;
-}
-.etapa:last-child::after{display:none;}
-.etapa-num{
-  font-family:'Space Mono',monospace;
-  font-size:.42rem;
-  color:var(--ouro-s);
-  letter-spacing:.3em;
-  margin-bottom:12px;
-}
-.etapa-nome{
-  font-size:.75rem;
-  font-weight:500;
-  letter-spacing:.08em;
-  margin-bottom:12px;
-  color:var(--ouro);
-}
-.etapa-desc{
-  font-size:.58rem;
-  color:var(--cinza-v);
-  line-height:1.8;
-  letter-spacing:.04em;
-}
-.etapa-acao{
-  margin-top:16px;
-  padding:8px 0 0;
-  border-top:1px solid var(--linha);
-  font-family:'Space Mono',monospace;
-  font-size:.45rem;
-  color:var(--cinza);
-  letter-spacing:.1em;
-}
+  .chat-box::-webkit-scrollbar { width: 3px; }
+  .chat-box::-webkit-scrollbar-track { background: transparent; }
+  .chat-box::-webkit-scrollbar-thumb { background: var(--gold-dim); }
 
-/* SCRIPTS PRÉ-CONFIGURADOS */
-.scripts-lista{
-  display:flex;
-  flex-direction:column;
-  gap:2px;
-}
-.script-item{
-  background:var(--bg3);
-  border:1px solid var(--linha);
-  padding:20px 24px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:20px;
-  cursor:pointer;
-  transition:border-color .3s, background .3s;
-}
-.script-item:hover{border-color:rgba(201,168,76,.2);background:rgba(201,168,76,.02);}
-.script-info{flex:1;}
-.script-titulo{font-size:.72rem;font-weight:400;margin-bottom:4px;letter-spacing:.05em;}
-.script-meta{font-family:'Space Mono',monospace;font-size:.45rem;color:var(--cinza-v);letter-spacing:.12em;}
-.script-badge{
-  padding:4px 10px;
-  font-family:'Space Mono',monospace;
-  font-size:.42rem;
-  letter-spacing:.1em;
-  border-radius:2px;
-}
-.badge-reel{background:rgba(74,144,226,.1);border:1px solid rgba(74,144,226,.3);color:var(--azul);}
-.badge-story{background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.3);color:var(--ouro);}
-.badge-legenda{background:rgba(29,185,84,.1);border:1px solid rgba(29,185,84,.3);color:var(--verde);}
+  .msg {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-width: 85%;
+    animation: fadeIn 0.3s ease;
+  }
 
-/* SIMULADOR WHATSAPP */
-.wa-sim{
-  max-width:480px;
-  margin:0 auto;
-  background:#0B141A;
-  border:1px solid rgba(255,255,255,.06);
-  border-radius:4px;
-  overflow:hidden;
-}
-.wa-topo{
-  background:#1F2C34;
-  padding:12px 20px;
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-.wa-avatar{
-  width:38px;height:38px;border-radius:50%;
-  background:linear-gradient(140deg,var(--ouro-s),var(--ouro));
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Playfair Display',serif;font-style:italic;
-  color:var(--bg);font-size:.9rem;
-}
-.wa-nome{font-size:.75rem;font-weight:400;color:#E9EDEF;margin-bottom:2px;}
-.wa-status{font-size:.58rem;color:#8696A0;}
-.wa-msgs{
-  padding:16px;
-  min-height:300px;
-  max-height:360px;
-  overflow-y:auto;
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-  background:#0B141A;
-  scrollbar-width:thin;
-  scrollbar-color:rgba(255,255,255,.1) transparent;
-}
-.wa-balao{
-  max-width:80%;
-  padding:10px 14px 6px;
-  border-radius:8px;
-  font-size:.68rem;
-  line-height:1.7;
-}
-.wa-ia{
-  align-self:flex-start;
-  background:#1F2C34;
-  color:#E9EDEF;
-  border-bottom-left-radius:0;
-}
-.wa-usr{
-  align-self:flex-end;
-  background:#005C4B;
-  color:#E9EDEF;
-  border-bottom-right-radius:0;
-}
-.wa-hora{
-  font-size:.48rem;color:#8696A0;
-  text-align:right;margin-top:4px;
-}
-.wa-input-row{
-  background:#1F2C34;
-  padding:10px 16px;
-  display:flex;
-  gap:10px;
-  align-items:center;
-}
-.wa-input{
-  flex:1;background:#2A3942;border:none;
-  color:#D1D7DB;padding:10px 16px;
-  border-radius:24px;font-family:'Syne',sans-serif;
-  font-size:.65rem;outline:none;
-}
-.wa-input::placeholder{color:#8696A0;}
-.wa-send{
-  width:40px;height:40px;border-radius:50%;
-  background:var(--verde);border:none;cursor:pointer;
-  color:white;font-size:.85rem;
-  display:flex;align-items:center;justify-content:center;
-  transition:background .2s;
-}
-.wa-send:hover{background:#25D366;}
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 
-/* STATS LINHA */
-.stats-linha{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:2px;
-}
+  .msg.user { align-self: flex-end; align-items: flex-end; }
+  .msg.jarves { align-self: flex-start; align-items: flex-start; }
 
-/* PROGRESSO */
-.progresso-wrap{
-  background:rgba(255,255,255,.04);
-  height:3px;
-  border-radius:2px;
-  overflow:hidden;
-  margin-top:6px;
-}
-.progresso-bar{
-  height:100%;
-  background:linear-gradient(to right,var(--ouro-s),var(--ouro));
-  border-radius:2px;
-  transition:width .6s ease;
-}
+  .msg-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+  }
 
-/* ── VITRINE EMBUTIDA ── */
-.vitrine-wrap{
-  position:relative;
-  width:100%;
-  height:calc(100vh - 57px);
-  display:flex;
-  flex-direction:column;
-}
-.vitrine-toolbar{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:10px 20px;
-  background:var(--bg3);
-  border-bottom:1px solid var(--linha);
-  flex-shrink:0;
-  gap:12px;
-}
-.vitrine-url{
-  flex:1;
-  font-family:'Space Mono',monospace;
-  font-size:.5rem;
-  color:var(--cinza-v);
-  letter-spacing:.1em;
-  background:rgba(255,255,255,.03);
-  border:1px solid var(--linha);
-  padding:7px 14px;
-  outline:none;
-  color:var(--ouro);
-}
-.vitrine-btns{display:flex;gap:8px;}
-.vitrine-frame{
-  flex:1;
-  width:100%;
-  border:none;
-  background:var(--bg2);
-}
-.vitrine-view-btns{
-  display:flex;
-  gap:4px;
-}
-.vbtn{
-  padding:5px 10px;
-  border:1px solid var(--linha);
-  background:transparent;
-  color:var(--cinza-v);
-  font-family:'Space Mono',monospace;
-  font-size:.42rem;
-  letter-spacing:.1em;
-  cursor:pointer;
-  transition:all .2s;
-}
-.vbtn:hover,.vbtn.on{border-color:var(--ouro);color:var(--ouro);background:rgba(201,168,76,.05);}
+  .msg.jarves .msg-label { color: var(--gold-dim); }
 
-/* MOBILE */
-@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
-@keyframes pulseVerde{0%,100%{box-shadow:0 0 0 0 rgba(29,185,84,.4);}50%{box-shadow:0 0 0 5px rgba(29,185,84,0);}}
-@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
-@keyframes slideIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+  .msg-bubble {
+    padding: 12px 16px;
+    font-size: 12px;
+    line-height: 1.7;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+  }
 
-/* MOBILE */
-@media(max-width:900px){
-  .app{grid-template-columns:1fr;}
-  .sidebar{display:none;}
-  .engine-grid,.flow-grid,.cards-3,.cards-2{grid-template-columns:1fr;}
-  .etapa::after{display:none;}
-  .stats-linha{grid-template-columns:1fr 1fr;}
-}
+  .msg.user .msg-bubble {
+    background: var(--surface3);
+    border: 1px solid var(--surface3);
+    color: var(--text);
+  }
+
+  .msg.jarves .msg-bubble {
+    background: rgba(201,168,76,0.06);
+    border: 1px solid rgba(201,168,76,0.2);
+    color: var(--text);
+  }
+
+  .typing {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 12px 16px;
+    background: rgba(201,168,76,0.06);
+    border: 1px solid rgba(201,168,76,0.2);
+    width: fit-content;
+  }
+
+  .typing span {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--gold);
+    animation: bounce 1.2s infinite;
+  }
+  .typing span:nth-child(2) { animation-delay: 0.2s; }
+  .typing span:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes bounce {
+    0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+    40% { transform: translateY(-5px); opacity: 1; }
+  }
+
+  .input-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .chat-input {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--surface3);
+    color: var(--text);
+    padding: 14px 16px;
+    font-size: 13px;
+    font-family: 'Cormorant Garamond', serif;
+    outline: none;
+    transition: border-color 0.2s;
+    resize: none;
+    height: 52px;
+  }
+
+  .chat-input:focus { border-color: var(--gold-dim); }
+  .chat-input::placeholder { color: var(--text-dim); font-style: italic; }
+
+  .send-btn {
+    background: var(--gold);
+    border: none;
+    color: var(--black);
+    padding: 0 24px;
+    font-size: 10px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    transition: background 0.2s;
+  }
+
+  .send-btn:hover { background: var(--gold-light); }
+  .send-btn:disabled { background: var(--gold-dim); cursor: not-allowed; }
+
+  /* SCRIPTS PANEL */
+  .scripts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .script-card {
+    background: var(--surface);
+    border: 1px solid var(--surface3);
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .script-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 2px; height: 100%;
+    background: var(--gold);
+    transform: scaleY(0);
+    transition: transform 0.2s;
+  }
+
+  .script-card:hover::before { transform: scaleY(1); }
+  .script-card:hover { border-color: var(--gold-dim); }
+
+  .script-tag {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+
+  .script-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .script-desc {
+    font-size: 10px;
+    color: var(--text-dim);
+    line-height: 1.6;
+    letter-spacing: 0.5px;
+  }
+
+  .generate-btn {
+    margin-top: 12px;
+    background: none;
+    border: 1px solid var(--gold-dim);
+    color: var(--gold);
+    font-size: 9px;
+    letter-spacing: 2px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-family: 'Space Mono', monospace;
+    transition: all 0.2s;
+  }
+
+  .generate-btn:hover {
+    background: rgba(201,168,76,0.1);
+  }
+
+  /* OUTPUT */
+  .output-box {
+    background: var(--surface);
+    border: 1px solid var(--surface3);
+    padding: 20px;
+    margin-top: 16px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    line-height: 1.8;
+    color: var(--text);
+    min-height: 100px;
+    white-space: pre-wrap;
+    display: none;
+    position: relative;
+  }
+
+  .output-box.visible { display: block; }
+
+  .copy-btn {
+    position: absolute;
+    top: 12px; right: 12px;
+    background: none;
+    border: 1px solid var(--surface3);
+    color: var(--text-dim);
+    font-size: 9px;
+    letter-spacing: 1px;
+    padding: 4px 10px;
+    cursor: pointer;
+    font-family: 'Space Mono', monospace;
+    transition: all 0.2s;
+  }
+
+  .copy-btn:hover { border-color: var(--gold-dim); color: var(--gold); }
+
+  /* FLUXO PANEL */
+  .fluxo-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .step {
+    display: flex;
+    gap: 20px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--surface3);
+  }
+
+  .step-num {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--gold);
+    min-width: 32px;
+    padding-top: 2px;
+  }
+
+  .step-content { flex: 1; }
+
+  .step-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .step-detail {
+    font-size: 11px;
+    color: var(--text-dim);
+    line-height: 1.7;
+    letter-spacing: 0.5px;
+  }
+
+  .step-badge {
+    font-size: 9px;
+    padding: 3px 8px;
+    border: 1px solid var(--surface3);
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    margin-top: 10px;
+    display: inline-block;
+  }
+
+  .step-badge.ok { border-color: var(--green); color: var(--green); }
+  .step-badge.pending { border-color: var(--gold-dim); color: var(--gold); }
+
+  /* FOOTER */
+  footer {
+    margin-top: 48px;
+    padding-top: 20px;
+    border-top: 1px solid var(--surface3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-brand {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 12px;
+    color: var(--text-dim);
+    font-style: italic;
+  }
+
+  .footer-note {
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+  }
+
+  /* LOADING */
+  .loading-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(8,8,8,0.8);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .loading-overlay.active { display: flex; }
+
+  .loading-ring {
+    width: 40px; height: 40px;
+    border: 2px solid var(--surface3);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-text {
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--gold);
+  }
+
+  @media (max-width: 600px) {
+    .scripts-grid { grid-template-columns: 1fr; }
+    .mode-selector { grid-template-columns: 1fr; }
+    .tabs { overflow-x: auto; }
+    .tab { white-space: nowrap; }
+  }
 </style>
 </head>
-
 <body>
-<div class="app">
 
-<!-- SIDEBAR -->
-<aside class="sidebar">
-  <div class="sidebar-logo">
-    <div class="logo-sys">JARVES · v2.0</div>
-    <div class="logo-name">Segunda Pele</div>
-    <div class="logo-status">
-      <div class="dot-live"></div>
-      Sistema ativo · Claude API
-    </div>
-  </div>
-  <nav class="sidebar-nav">
-    <div class="nav-section">Central</div>
-    <div class="nav-item ativo" onclick="trocarPanel('dashboard',this)">
-      <span class="nav-icon">◈</span> Dashboard
-    </div>
-    <div class="nav-section">Conteúdo</div>
-    <div class="nav-item" onclick="trocarPanel('engine',this)">
-      <span class="nav-icon">⚡</span> Engine de Scripts
-    </div>
-    <div class="nav-item" onclick="trocarPanel('biblioteca',this)">
-      <span class="nav-icon">◧</span> Biblioteca
-    </div>
-    <div class="nav-section">Atendimento</div>
-    <div class="nav-item" onclick="trocarPanel('fluxo',this)">
-      <span class="nav-icon">◎</span> Fluxo do Agente
-    </div>
-    <div class="nav-item" onclick="trocarPanel('simulador',this)">
-      <span class="nav-icon">◉</span> Simulador WhatsApp
-    </div>
-    <div class="nav-section">Cliente</div>
-    <div class="nav-item" onclick="trocarPanel('vitrine',this)">
-      <span class="nav-icon">◆</span> Vitrine Segunda Pele
-    </div>
-    <div class="nav-section">Sistema</div>
-    <div class="nav-item" onclick="trocarPanel('config',this)">
-      <span class="nav-icon">◫</span> Configuração
-    </div>
-  </nav>
-  <div class="sidebar-footer">
-    @alvesdemelosadraque<br>
-    12 peças · ciclo mensal<br>
-    Ouro 18K · SP · Tatuapé
-  </div>
-</aside>
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-ring"></div>
+  <div class="loading-text">PROCESSANDO</div>
+</div>
 
-<!-- MAIN -->
-<main class="main">
-  <div class="topbar">
-    <div class="topbar-title">Jarves · <span id="topbarLabel">Dashboard</span></div>
-    <div class="topbar-right">
-      <div class="badge">OURO 18K</div>
-      <div class="badge" id="vagasBadge">4 VAGAS</div>
+<div class="container">
+
+  <header>
+    <div class="brand">
+      <div class="brand-name">Segunda Pele · Jóias de Ouro</div>
+      <div class="jarves-title">J.A.R.V.E.S.</div>
+    </div>
+    <div class="status-pill">
+      <div class="status-dot"></div>
+      SISTEMA ATIVO
+    </div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('chat')">ASSISTENTE</button>
+    <button class="tab" onclick="switchTab('scripts')">SCRIPTS DE VENDA</button>
+    <button class="tab" onclick="switchTab('fluxo')">FLUXO JARVES</button>
+  </div>
+
+  <!-- CHAT PANEL -->
+  <div class="panel active" id="panel-chat">
+    <div class="chat-wrapper">
+
+      <div class="mode-selector">
+        <button class="mode-btn active" onclick="setMode(this, 'vendas')">MODO VENDAS</button>
+        <button class="mode-btn" onclick="setMode(this, 'dm')">RESPONDER DM</button>
+        <button class="mode-btn" onclick="setMode(this, 'conteudo')">GERAR CONTEÚDO</button>
+      </div>
+
+      <div class="chat-box" id="chatBox">
+        <div class="msg jarves">
+          <div class="msg-label">J.A.R.V.E.S.</div>
+          <div class="msg-bubble">Sistema inicializado. Sou o assistente de inteligência da Segunda Pele — 17 anos de ouro, 12 peças por mês, zero compromisso com o comum. Como posso servir?</div>
+        </div>
+      </div>
+
+      <div class="input-row">
+        <textarea class="chat-input" id="chatInput" placeholder="Digite sua mensagem ou cole um DM recebido..." onkeydown="handleKey(event)"></textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">ENVIAR</button>
+      </div>
+
     </div>
   </div>
 
-  <!-- ── DASHBOARD ── -->
-  <div class="panel ativo" id="panel-dashboard">
-    <div class="sec-header">
-      <div>
-        <div class="sec-titulo">Sistema <span>Operacional</span></div>
-        <div class="sec-desc">Segunda Pele · Engine de Conteúdo + Agente IA · Tudo em um só lugar.</div>
+  <!-- SCRIPTS PANEL -->
+  <div class="panel" id="panel-scripts">
+    <div class="scripts-grid">
+
+      <div class="script-card">
+        <div class="script-tag">MÓDULO 01</div>
+        <div class="script-title">Comentário → DM</div>
+        <div class="script-desc">Resposta pública ao comentário + abertura de DM com catálogo premium. Palavras-chave: EXCLUSIVO, QUERO, RESERVA.</div>
+        <button class="generate-btn" onclick="generateScript('comentario_dm')">GERAR COPY</button>
       </div>
+
+      <div class="script-card">
+        <div class="script-tag">MÓDULO 02</div>
+        <div class="script-title">Resgate de Lead Frio</div>
+        <div class="script-desc">Reativação de quem interagiu mas não converteu. Escassez real + exclusividade + urgência sem pressão.</div>
+        <button class="generate-btn" onclick="generateScript('resgate_lead')">GERAR COPY</button>
+      </div>
+
+      <div class="script-card">
+        <div class="script-tag">MÓDULO 03</div>
+        <div class="script-title">WhatsApp — Qualificação</div>
+        <div class="script-desc">Fluxo de 4 mensagens para qualificar no WhatsApp Business. Identifica intenção e momento de compra.</div>
+        <button class="generate-btn" onclick="generateScript('whatsapp_qualificacao')">GERAR COPY</button>
+      </div>
+
+      <div class="script-card">
+        <div class="script-tag">MÓDULO 04</div>
+        <div class="script-title">Objeção — Preço</div>
+        <div class="script-desc">Resposta elegante para quem questiona o valor. Reposiciona ouro como patrimônio, não custo.</div>
+        <button class="generate-btn" onclick="generateScript('objecao_preco')">GERAR COPY</button>
+      </div>
+
+      <div class="script-card">
+        <div class="script-tag">MÓDULO 05</div>
+        <div class="script-title">Story — Escassez Real</div>
+        <div class="script-desc">Copy para story mostrando unidades restantes da fundição. Cria urgência autêntica sem apelo barato.</div>
+        <button class="generate-btn" onclick="generateScript('story_escassez')">GERAR COPY</button>
+      </div>
+
+      <div class="script-card">
+        <div class="script-tag">MÓDULO 06</div>
+        <div class="script-title">Pós-Venda — Fidelização</div>
+        <div class="script-desc">Mensagem após entrega para ativar indicação e criar cliente embaixador da marca.</div>
+        <button class="generate-btn" onclick="generateScript('pos_venda')">GERAR COPY</button>
+      </div>
+
     </div>
 
-    <div class="stats-linha">
-      <div class="card">
-        <div class="card-label">Ciclo Atual</div>
-        <div class="card-value">12</div>
-        <div class="card-sub">peças numeradas / mês</div>
-        <div class="progresso-wrap"><div class="progresso-bar" style="width:66%"></div></div>
-      </div>
-      <div class="card">
-        <div class="card-label">Vagas Restantes</div>
-        <div class="card-value" id="vagasNum">4</div>
-        <div class="card-sub">neste ciclo · urgência real</div>
-        <div class="progresso-wrap"><div class="progresso-bar" style="width:33%"></div></div>
-      </div>
-      <div class="card">
-        <div class="card-label">Scripts Gerados</div>
-        <div class="card-value" id="scriptsCount">0</div>
-        <div class="card-sub">via engine IA nesta sessão</div>
-        <div class="progresso-wrap"><div class="progresso-bar" style="width:0%" id="scriptProgress"></div></div>
-      </div>
-      <div class="card">
-        <div class="card-label">Meta Mensal</div>
-        <div class="card-value">R$60k</div>
-        <div class="card-sub">high ticket · orgânico</div>
-        <div class="progresso-wrap"><div class="progresso-bar" style="width:45%"></div></div>
-      </div>
-    </div>
-
-    <div class="cards cards-2">
-      <div class="card" style="padding:28px;">
-        <div class="card-label" style="margin-bottom:16px">Funil Arpão — Status</div>
-        <div style="display:flex;flex-direction:column;gap:12px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;">
-            <span style="font-size:.62rem;color:var(--cinza-v)">Conteúdo Orgânico</span>
-            <span style="font-family:'Space Mono',monospace;font-size:.55rem;color:var(--verde)">● ATIVO</span>
-          </div>
-          <div style="display:flex;align-items:center;justify-content:space-between;">
-            <span style="font-size:.62rem;color:var(--cinza-v)">ManyChat RESERVA</span>
-            <span style="font-family:'Space Mono',monospace;font-size:.55rem;color:var(--verde)">● ATIVO</span>
-          </div>
-          <div style="display:flex;align-items:center;justify-content:space-between;">
-            <span style="font-size:.62rem;color:var(--cinza-v)">Landing Page Vitrine</span>
-            <span style="font-family:'Space Mono',monospace;font-size:.55rem;color:var(--ouro)">● DEPLOY</span>
-          </div>
-          <div style="display:flex;align-items:center;justify-content:space-between;">
-            <span style="font-size:.62rem;color:var(--cinza-v)">Agente Mercedes/Bárbara</span>
-            <span style="font-family:'Space Mono',monospace;font-size:.55rem;color:var(--ouro)">● STAGING</span>
-          </div>
-          <div style="display:flex;align-items:center;justify-content:space-between;">
-            <span style="font-size:.62rem;color:var(--cinza-v)">CRM · Leads Ativos</span>
-            <span style="font-family:'Space Mono',monospace;font-size:.55rem;color:var(--azul)">● EDILENE / KELLEN</span>
-          </div>
-        </div>
-      </div>
-      <div class="card" style="padding:28px;">
-        <div class="card-label" style="margin-bottom:16px">7 Princípios Ativos</div>
-        <div style="display:flex;flex-direction:column;gap:10px;">
-          <div style="font-size:.62rem;color:var(--cinza-v);padding-left:12px;border-left:2px solid var(--ouro-s)">Luxo como presença, não posse</div>
-          <div style="font-size:.62rem;color:var(--cinza-v);padding-left:12px;border-left:2px solid var(--ouro-s)">Efeito Rosenthal</div>
-          <div style="font-size:.62rem;color:var(--cinza-v);padding-left:12px;border-left:2px solid var(--ouro-s)">Reserva cognitiva oculta</div>
-          <div style="font-size:.62rem;color:var(--cinza-v);padding-left:12px;border-left:2px solid var(--ouro-s)">Controle de escassez</div>
-          <div style="font-size:.62rem;color:var(--cinza-v);padding-left:12px;border-left:2px solid var(--ouro-s)">Superioridade de prova social</div>
-          <div style="font-size:.62rem;color:var(--cinza-v);padding-left:12px;border-left:2px solid var(--ouro-s)">Reciprocidade pela educação</div>
-          <div style="font-size:.62rem;color:var(--cinza-v);padding-left:12px;border-left:2px solid var(--ouro-s)">Ancoragem de preço</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card" style="padding:28px;">
-      <div class="card-label" style="margin-bottom:16px">Próximas Ações · Plano de Contingência</div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;flex-wrap:wrap;">
-        <div style="font-size:.62rem;color:var(--cinza-v);line-height:1.8;padding:16px;background:rgba(255,255,255,.02);border:1px solid var(--linha)">
-          <div style="color:var(--ouro);font-family:'Space Mono',monospace;font-size:.45rem;letter-spacing:.2em;margin-bottom:8px">CONTEÚDO</div>
-          Gerar 5 scripts/semana via Engine. Postar às 19h30. Fotos > Reels na proporção 70/30.
-        </div>
-        <div style="font-size:.62rem;color:var(--cinza-v);line-height:1.8;padding:16px;background:rgba(255,255,255,.02);border:1px solid var(--linha)">
-          <div style="color:var(--azul);font-family:'Space Mono',monospace;font-size:.45rem;letter-spacing:.2em;margin-bottom:8px">FUNIL</div>
-          Keyword RESERVA ativa. DM → qualificação → WhatsApp. Zero preço público. Zero desconto.
-        </div>
-        <div style="font-size:.62rem;color:var(--cinza-v);line-height:1.8;padding:16px;background:rgba(255,255,255,.02);border:1px solid var(--linha)">
-          <div style="color:var(--verde);font-family:'Space Mono',monospace;font-size:.45rem;letter-spacing:.2em;margin-bottom:8px">CONVERSÃO</div>
-          Parcelamento como alternativa ao desconto. Escassez real, nunca fabricada. Lista de espera prioritária.
-        </div>
-      </div>
+    <div class="output-box" id="scriptOutput">
+      <button class="copy-btn" onclick="copyOutput()">COPIAR</button>
+      <div id="scriptText"></div>
     </div>
   </div>
 
-  <!-- ── ENGINE DE SCRIPTS ── -->
-  <div class="panel" id="panel-engine">
-    <div class="sec-header">
-      <div>
-        <div class="sec-titulo">Engine de <span>Conteúdo IA</span></div>
-        <div class="sec-desc">Gere scripts de Reels, Stories e legendas com a narrativa "Luxo Silencioso" calibrada para a Segunda Pele.</div>
-      </div>
-    </div>
-
-    <div class="engine-grid">
-      <!-- CONTROLES -->
-      <div class="card" style="padding:28px;">
-        <div class="form-group">
-          <label class="form-label">Formato</label>
-          <select class="form-select" id="formato">
-            <option value="reel">Reel / TikTok (30-60s)</option>
-            <option value="story">Story Sequência (3-5 frames)</option>
-            <option value="legenda">Legenda de Foto</option>
-            <option value="carrossel">Carrossel Educativo</option>
-            <option value="hook">Hook de Abertura (3s)</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Ângulo Narrativo</label>
-          <select class="form-select" id="angulo">
-            <option value="postura">A postura de quem usa ouro maciço</option>
-            <option value="investimento">Ouro como investimento vivo</option>
-            <option value="escassez">12 peças — e então acabou</option>
-            <option value="artesao">17 anos nas mesmas mãos</option>
-            <option value="identidade">Você sabe o que carrega</option>
-            <option value="silencio">O luxo que não precisa se anunciar</option>
-            <option value="presenca">Presença antes de posse</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Princípio Psicológico</label>
-          <div class="tags-grupo" id="principios">
-            <button class="tag-toggle on" data-v="escassez">Escassez</button>
-            <button class="tag-toggle" data-v="identidade">Identidade</button>
-            <button class="tag-toggle" data-v="reciprocidade">Reciprocidade</button>
-            <button class="tag-toggle" data-v="prova_social">Prova Social</button>
-            <button class="tag-toggle" data-v="ancoragem">Ancoragem</button>
-            <button class="tag-toggle" data-v="rosenthal">Rosenthal</button>
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Contexto adicional (opcional)</label>
-          <textarea class="form-textarea" id="contexto" placeholder="Ex: Dia dos namorados, peça específica, lead fria reaquecendo..."></textarea>
-        </div>
-        <button class="btn-gerar" id="btnGerar" onclick="gerarScript()">
-          ⚡ Gerar Script Agora
-        </button>
-      </div>
-
-      <!-- OUTPUT -->
-      <div class="output-box">
-        <div class="output-header">
-          <div class="output-label" id="outputLabel">Aguardando geração...</div>
-          <div class="output-actions">
-            <button class="btn-mini" onclick="copiarScript()">COPIAR</button>
-            <button class="btn-mini" onclick="salvarScript()">SALVAR</button>
-          </div>
-        </div>
-        <div class="output-content vazio" id="outputContent">
-          Configure o formato e ângulo ao lado → clique em Gerar
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── BIBLIOTECA ── -->
-  <div class="panel" id="panel-biblioteca">
-    <div class="sec-header">
-      <div>
-        <div class="sec-titulo">Biblioteca de <span>Scripts</span></div>
-        <div class="sec-desc">Scripts validados, salvos e prontos para usar. Benchmark: "Você sabe o peso..."</div>
-      </div>
-    </div>
-    <div class="scripts-lista" id="bibliotecaLista">
-      <!-- presets fixos -->
-      <div class="script-item" onclick="carregarScript(0)">
-        <div class="script-info">
-          <div class="script-titulo">O Peso do Silêncio · Reel Benchmark</div>
-          <div class="script-meta">ESCASSEZ · IDENTIDADE · 45s</div>
-        </div>
-        <span class="script-badge badge-reel">REEL</span>
-      </div>
-      <div class="script-item" onclick="carregarScript(1)">
-        <div class="script-info">
-          <div class="script-titulo">17 Anos, Uma Peça · Story Sequência</div>
-          <div class="script-meta">ROSENTHAL · ARTESÃO · 5 frames</div>
-        </div>
-        <span class="script-badge badge-story">STORY</span>
-      </div>
-      <div class="script-item" onclick="carregarScript(2)">
-        <div class="script-info">
-          <div class="script-titulo">Você Sabe o Quilate · Legenda Foto</div>
-          <div class="script-meta">ÂNCORA · PROVA SOCIAL · benchmark</div>
-        </div>
-        <span class="script-badge badge-legenda">LEGENDA</span>
-      </div>
-      <div class="script-item" onclick="carregarScript(3)">
-        <div class="script-info">
-          <div class="script-titulo">12 Peças. Apenas. · Hook 3s</div>
-          <div class="script-meta">ESCASSEZ PURA · abertura de reel</div>
-        </div>
-        <span class="script-badge badge-reel">HOOK</span>
-      </div>
-    </div>
-    <!-- scripts salvos dinamicamente -->
-    <div id="scriptsGravados" style="display:flex;flex-direction:column;gap:2px;margin-top:2px;"></div>
-  </div>
-
-  <!-- ── FLUXO DO AGENTE ── -->
+  <!-- FLUXO PANEL -->
   <div class="panel" id="panel-fluxo">
-    <div class="sec-header">
-      <div>
-        <div class="sec-titulo">Fluxo do <span>Agente IA</span></div>
-        <div class="sec-desc">Arquitetura de atendimento WhatsApp Business · Bárbara / Mercedes · 4 etapas de sofisticação crescente.</div>
-      </div>
-    </div>
-    <div class="flow-grid">
-      <div class="etapa">
-        <div class="etapa-num">01 · RECEPÇÃO</div>
-        <div class="etapa-nome">Identificação</div>
-        <div class="etapa-desc">Via n8n + CRM: identifica lead pelo número, puxa nome e histórico. Trata pelo nome desde a primeira mensagem.</div>
-        <div class="etapa-acao">n8n → CRM lookup → nome + status</div>
-      </div>
-      <div class="etapa">
-        <div class="etapa-num">02 · QUALIFICAÇÃO</div>
-        <div class="etapa-nome">Filtro de Intenção</div>
-        <div class="etapa-desc">Perguntas abertas sobre estilo e ocasião. Filtra: busca preço ou busca exclusividade? Só avança quem demonstra fit.</div>
-        <div class="etapa-acao">Pergunta aberta → análise de resposta</div>
-      </div>
-      <div class="etapa">
-        <div class="etapa-num">03 · CURADORIA</div>
-        <div class="etapa-nome">Acesso VIP</div>
-        <div class="etapa-desc">Envia fotos exclusivas não disponíveis no site. Apresenta a peça certa para o momento da cliente. Ativa escassez real.</div>
-        <div class="etapa-acao">Foto exclusiva + "4 vagas neste ciclo"</div>
-      </div>
-      <div class="etapa">
-        <div class="etapa-num">04 · FECHAMENTO</div>
-        <div class="etapa-nome">Conversão</div>
-        <div class="etapa-desc">Link de pagamento direto ou agendamento de chamada com Sadraque. Zero fricção. Tom: consultoria, nunca venda.</div>
-        <div class="etapa-acao">Link pix/cartão ou agenda call</div>
-      </div>
-    </div>
+    <div class="fluxo-steps">
 
-    <div class="cards cards-2" style="margin-top:0;">
-      <div class="card" style="padding:28px;">
-        <div class="card-label" style="margin-bottom:16px">Regras Absolutas do Agente</div>
-        <div style="display:flex;flex-direction:column;gap:10px;">
-          <div style="font-size:.62rem;color:var(--cinza-v);line-height:1.8;padding-left:12px;border-left:2px solid var(--vermelho)">Nunca revelar preço sem qualificação completa</div>
-          <div style="font-size:.62rem;color:var(--cinza-v);line-height:1.8;padding-left:12px;border-left:2px solid var(--vermelho)">Nunca oferecer desconto — alternativa: parcelamento</div>
-          <div style="font-size:.62rem;color:var(--cinza-v);line-height:1.8;padding-left:12px;border-left:2px solid var(--vermelho)">Nunca compartilhar WhatsApp em comentários públicos</div>
-          <div style="font-size:.62rem;color:var(--cinza-v);line-height:1.8;padding-left:12px;border-left:2px solid var(--vermelho)">Nunca usar a palavra "promoção" ou "oferta"</div>
-          <div style="font-size:.62rem;color:var(--cinza-v);line-height:1.8;padding-left:12px;border-left:2px solid var(--verde)">Sempre: escassez real, não fabricada</div>
-          <div style="font-size:.62rem;color:var(--cinza-v);line-height:1.8;padding-left:12px;border-left:2px solid var(--verde)">Sempre: tom de consultora — nunca vendedora</div>
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-content">
+          <div class="step-title">Trigger — Palavra-chave no Comentário</div>
+          <div class="step-detail">ManyChat monitora posts do @alvesdemelosadraque. Ao detectar EXCLUSIVO, QUERO, RESERVA ou PEÇA — dispara o fluxo em segundos.</div>
+          <div class="step-badge pending">CONFIGURAR MANYCHAT</div>
         </div>
       </div>
-      <div class="card" style="padding:28px;">
-        <div class="card-label" style="margin-bottom:16px">Gatilhos de Ativação</div>
-        <div style="display:flex;flex-direction:column;gap:10px;">
-          <div style="font-size:.62rem;color:var(--cinza-v);line-height:1.8;display:flex;justify-content:space-between;align-items:center;">
-            <span>Keyword RESERVA no DM</span>
-            <span style="font-family:'Space Mono',monospace;font-size:.45rem;color:var(--verde)">→ fluxo automático</span>
-          </div>
-          <div style="font-size:.62rem;color:var(--cinza-v);line-height:1.8;display:flex;justify-content:space-between;align-items:center;">
-            <span>Clique em "Consultar Valor" (site)</span>
-            <span style="font-family:'Space Mono',monospace;font-size:.45rem;color:var(--verde)">→ Mercedes ativa</span>
-          </div>
-          <div style="font-size:.62rem;color:var(--cinza-v);line-height:1.8;display:flex;justify-content:space-between;align-items:center;">
-            <span>Salvo nos favoritos 3x</span>
-            <span style="font-family:'Space Mono',monospace;font-size:.45rem;color:var(--ouro)">→ DM manual</span>
-          </div>
-          <div style="font-size:.62rem;color:var(--cinza-v);line-height:1.8;display:flex;justify-content:space-between;align-items:center;">
-            <span>Story view 5x sem resposta</span>
-            <span style="font-family:'Space Mono',monospace;font-size:.45rem;color:var(--ouro)">→ DM reaquecimento</span>
-          </div>
+
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-content">
+          <div class="step-title">Resposta Pública Automática</div>
+          <div class="step-detail">Comentário público gerado instantaneamente. Humanizado, sem parecer robô. Gera prova social e aumenta alcance do post.</div>
+          <div class="step-badge pending">AGUARDANDO INTEGRAÇÃO</div>
         </div>
       </div>
+
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-content">
+          <div class="step-title">DM Automático — Catálogo de Alto Valor</div>
+          <div class="step-detail">No mesmo segundo, o lead recebe DM com abertura premium + link do catálogo digital. Groq AI personaliza a mensagem baseada no contexto.</div>
+          <div class="step-badge ok">GROQ CONECTADO</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">04</div>
+        <div class="step-content">
+          <div class="step-title">Qualificação em 4 Mensagens</div>
+          <div class="step-detail">Fluxo de DM que identifica: interesse real, peça desejada, ocasião e capacidade. Sem parecer formulário — parece conversa de atelier.</div>
+          <div class="step-badge pending">CONSTRUIR FLUXO</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">05</div>
+        <div class="step-content">
+          <div class="step-title">Transferência para WhatsApp Business</div>
+          <div class="step-detail">Lead qualificado recebe link WhatsApp pré-formatado com contexto já passado. Sadraque entra na conversa apenas para fechar.</div>
+          <div class="step-badge pending">INTEGRAR WABA</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">06</div>
+        <div class="step-content">
+          <div class="step-title">Funil de Arpão — Resgate Automático</div>
+          <div class="step-detail">Leads que interagiram e não converteram entram em sequência de reativação. Escassez real baseada nas 12 peças mensais.</div>
+          <div class="step-badge pending">FASE 2</div>
+        </div>
+      </div>
+
     </div>
   </div>
 
-  <!-- ── SIMULADOR ── -->
-  <div class="panel" id="panel-simulador">
-    <div class="sec-header">
-      <div>
-        <div class="sec-titulo">Simulador <span>WhatsApp</span></div>
-        <div class="sec-desc">Teste o fluxo do agente Bárbara/Mercedes em tempo real antes de subir para o WhatsApp Business.</div>
-      </div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;">
-      <div class="wa-sim">
-        <div class="wa-topo">
-          <div class="wa-avatar">B</div>
-          <div>
-            <div class="wa-nome">Bárbara · Segunda Pele</div>
-            <div class="wa-status">online</div>
-          </div>
-        </div>
-        <div class="wa-msgs" id="waMsgs">
-          <div class="wa-balao wa-ia">
-            Olá. Sou a Bárbara, consultora da Segunda Pele. Joias de ouro 18K, feitas à mão — 12 por mês, numeradas. Como posso te ajudar?
-            <div class="wa-hora">19:01</div>
-          </div>
-        </div>
-        <div class="wa-input-row">
-          <input class="wa-input" id="waInput" type="text" placeholder="Digite sua mensagem..." />
-          <button class="wa-send" onclick="enviarWA()">↑</button>
-        </div>
-      </div>
+  <footer>
+    <div class="footer-brand">Esse trabalho é da minha vida. Não tenho pressa para ele.</div>
+    <div class="footer-note">JARVES v1.0 · 2026</div>
+  </footer>
 
-      <div class="card" style="padding:28px;">
-        <div class="card-label" style="margin-bottom:20px">Respostas Pré-configuradas · Alta Conversão</div>
-        <div style="display:flex;flex-direction:column;gap:10px;">
-          <button class="btn-mini" style="text-align:left;padding:10px 14px;width:100%" onclick="simularLeadMsg('Quanto custa o anel?')">
-            Lead: "Quanto custa o anel?"
-          </button>
-          <button class="btn-mini" style="text-align:left;padding:10px 14px;width:100%" onclick="simularLeadMsg('Vi no story, quero saber mais')">
-            Lead: "Vi no story, quero saber mais"
-          </button>
-          <button class="btn-mini" style="text-align:left;padding:10px 14px;width:100%" onclick="simularLeadMsg('Tem desconto?')">
-            Lead: "Tem desconto?"
-          </button>
-          <button class="btn-mini" style="text-align:left;padding:10px 14px;width:100%" onclick="simularLeadMsg('Preciso de um presente especial')">
-            Lead: "Preciso de um presente especial"
-          </button>
-          <button class="btn-mini" style="text-align:left;padding:10px 14px;width:100%" onclick="simularLeadMsg('RESERVA')">
-            Lead: "RESERVA" (keyword trigger)
-          </button>
-        </div>
-        <div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--linha);">
-          <div class="card-label">Análise da Conversa</div>
-          <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px;">
-            <div style="display:flex;justify-content:space-between;">
-              <span style="font-size:.6rem;color:var(--cinza-v)">Intenção detectada</span>
-              <span style="font-family:'Space Mono',monospace;font-size:.5rem;color:var(--ouro)" id="intencaoLabel">–</span>
-            </div>
-            <div style="display:flex;justify-content:space-between;">
-              <span style="font-size:.6rem;color:var(--cinza-v)">Etapa do funil</span>
-              <span style="font-family:'Space Mono',monospace;font-size:.5rem;color:var(--azul)" id="etapaLabel">–</span>
-            </div>
-            <div style="display:flex;justify-content:space-between;">
-              <span style="font-size:.6rem;color:var(--cinza-v)">Score de qualificação</span>
-              <span style="font-family:'Space Mono',monospace;font-size:.5rem;color:var(--verde)" id="scoreLabel">–</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── CONFIG ── -->
-  <div class="panel" id="panel-config">
-    <div class="sec-header">
-      <div>
-        <div class="sec-titulo"><span>Configuração</span> do Sistema</div>
-        <div class="sec-desc">Parâmetros do Jarves · Segunda Pele · Ajuste conforme o ciclo.</div>
-      </div>
-    </div>
-    <div class="cards cards-2">
-      <div class="card" style="padding:28px;">
-        <div class="card-label" style="margin-bottom:16px">Identidade das Agentes</div>
-        <div class="form-group">
-          <label class="form-label">Nome da Agente Principal</label>
-          <input class="form-input" id="cfgNomeAgente" value="Mercedes" type="text"/>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Vagas no Ciclo Atual</label>
-          <input class="form-input" id="cfgVagas" value="4" type="number" min="1" max="12"/>
-        </div>
-        <div class="form-group">
-          <label class="form-label">WhatsApp (com DDI)</label>
-          <input class="form-input" id="cfgWA" value="5511999999999" type="text"/>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Instagram</label>
-          <input class="form-input" id="cfgIG" value="@alvesdemelosadraque" type="text"/>
-        </div>
-        <button class="btn-gerar" onclick="salvarConfig()">Salvar Configuração</button>
-      </div>
-      <div class="card" style="padding:28px;">
-        <div class="card-label" style="margin-bottom:16px">Sistema · Notas de Versão</div>
-        <div style="font-size:.62rem;color:var(--cinza-v);line-height:2;font-family:'Space Mono',monospace;">
-          JARVES v2.0<br>
-          ─────────────────────<br>
-          ✓ Engine de Scripts IA<br>
-          ✓ Biblioteca de Conteúdo<br>
-          ✓ Fluxo Agente 4 Etapas<br>
-          ✓ Simulador WhatsApp<br>
-          ✓ Dashboard Operacional<br>
-          ─────────────────────<br>
-          Powered by Claude API<br>
-          Deploy: GitHub Pages<br>
-          Repo: sadraquemelo/Jarves-
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── VITRINE EMBUTIDA ── -->
-  <div class="panel" id="panel-vitrine" style="padding:0;gap:0;">
-    <div class="vitrine-wrap">
-      <div class="vitrine-toolbar">
-        <div class="vitrine-view-btns">
-          <button class="vbtn on" id="vbtnDesktop" onclick="setVitrineView('desktop')">Desktop</button>
-          <button class="vbtn" id="vbtnTablet" onclick="setVitrineView('tablet')">Tablet</button>
-          <button class="vbtn" id="vbtnMobile" onclick="setVitrineView('mobile')">Mobile</button>
-        </div>
-        <input class="vitrine-url" id="vitrineUrl" value="segunda-pele-vitrine.html" readonly />
-        <div class="vitrine-btns">
-          <button class="btn-mini" onclick="recarregarVitrine()">↺ RELOAD</button>
-          <button class="btn-mini" onclick="abrirVitrine()">↗ ABRIR</button>
-        </div>
-      </div>
-      <div style="flex:1;display:flex;align-items:center;justify-content:center;background:#0a0c0e;overflow:auto;padding:0;" id="vitrineViewport">
-        <iframe
-          id="vitrineFrame"
-          src="segunda-pele-vitrine.html"
-          class="vitrine-frame"
-          style="width:100%;height:100%;border:none;"
-          title="Segunda Pele Vitrine"
-        ></iframe>
-      </div>
-    </div>
-  </div>
-
-</main>
 </div>
 
 <script>
-/* ─────── NAVEGAÇÃO ─────── */
-function trocarPanel(id, el){
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('ativo'));
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('ativo'));
-  document.getElementById('panel-'+id).classList.add('ativo');
-  el.classList.add('ativo');
-  const labels = {dashboard:'Dashboard',engine:'Engine de Scripts',biblioteca:'Biblioteca',fluxo:'Fluxo do Agente',simulador:'Simulador WA',config:'Configuração',vitrine:'Vitrine · Segunda Pele'};
-  document.getElementById('topbarLabel').textContent = labels[id] || id;
 
-  // ao entrar na vitrine, garante que o iframe carregou
-  if(id === 'vitrine'){
-    const fr = document.getElementById('vitrineFrame');
-    if(!fr.src || fr.src === 'about:blank') fr.src = 'segunda-pele-vitrine.html';
-  }
-}
+const MODEL = 'llama3-8b-8192';
 
-/* ─────── VITRINE EMBUTIDA ─────── */
-const VITRINE_SIZES = {
-  desktop: {width:'100%',   height:'100%',  shadow:'none'},
-  tablet:  {width:'768px',  height:'1024px',shadow:'0 0 0 1px rgba(201,168,76,.2)'},
-  mobile:  {width:'390px',  height:'844px', shadow:'0 0 0 1px rgba(201,168,76,.3)'}
+let currentMode = 'vendas';
+
+const SYSTEM_PROMPTS = {
+
+  vendas: `Você é Bárbara Mercedes, o cérebro operacional da alta joalheria Sadraque Melo Segunda Pele.
+Estilo: minimalista, direto, imponente. Você não vende — você controla acesso.
+
+REGRAS ABSOLUTAS:
+1. NUNCA use: "Prezado", "Caro", "agradeço seu interesse", "gostaria de compartilhar".
+2. NUNCA peça permissão para enviar algo. Assuma o próximo passo.
+3. PROIBIDO: "acessível", "barato", "catálogo". Use: "patrimônio", "reserva", "acesso".
+4. Resposta pública: curta, enigmática, direciona para DM.
+5. Mensagem de DM: direta, escassez real, força decisão de alto valor.
+6. O cliente deseja a peça. Você controla o acesso a ela.
+7. Texto limpo. Sem aspas externas. Sem introduções explicativas.`,
+
+  dm: `Você é Bárbara Mercedes, assistente de atendimento da Segunda Pele.
+Quando receber uma mensagem de DM ou comentário de cliente, gere a resposta ideal – use escassez real (12 peças/mês), exclusividade e identidade. Nunca mencione desconto.
+Tom: como um sommelier de joias, não um vendedor.
+Responda em português brasileiro.`,
+
+  conteudo: `Você é Bárbara Mercedes, estrategista de conteúdo da Segunda Pele.
+Crie copies para Instagram, stories, reels e legendas que convertem.
+Use os 7 princípios: luxo como presença, Efeito Rosenthal, reserva cognitiva oculta, contexto, controle de escassez, prova social superior, reciprocidade pela educação, ancoragem de preço.
+Formato de post: impacto emocional primeiro, contexto depois, call para ação nunca urgente — sempre elegante.
+Responda em português brasileiro.`
+};
+const SCRIPT_PROMPTS = {
+  comentario_dm: `Crie dois textos para a Segunda Pele joalheria:
+1. RESPOSTA PÚBLICA ao comentário de alguém que escreveu "RESERVA" ou "OURO
+" no Instagram. Curta, enigmática, direciona para DM.
+2. MENSAGEM DE DM direta. Mencione escassez real (12 peças/mês). Convide para reserva.`,
+
+  resgate_lead: `Crie 3 mensagens de reativação para lead que viu mas não comprou:
+Mensagem 1 (dia 3): interesse genuíno
+Mensagem 2 (dia 7): escassez real
+Mensagem 3 (dia 14): última oportunidade elegante`,
+
+  whatsapp_qualificacao: `Crie fluxo de 4 mensagens para qualificar leads no WhatsApp Business da Segunda Pele. Tom: atelier exclusivo, não formulário.`,
+
+  objecao_preco: `Crie 3 respostas elegantes para quando cliente questiona o preço. Reposicione como patrimônio, não custo. Nunca ofereça desconto.`,
+
+  story_escassez: `Crie 3 copies de story comunicando escassez real. Máximo 3 linhas cada. Direto. Elegante.`,
+
+  pos_venda: `Crie mensagem de pós-venda para enviar após entrega. Mencione número da peça (X de 12). Tom: carta de artesão.`
 };
 
-function setVitrineView(modo){
-  const frame = document.getElementById('vitrineFrame');
-  const vp    = document.getElementById('vitrineViewport');
-  const s     = VITRINE_SIZES[modo];
+function setMode(btn, mode) {
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentMode = mode;
+}
 
-  document.querySelectorAll('.vbtn').forEach(b=>b.classList.remove('on'));
-  document.getElementById('vbtn'+modo.charAt(0).toUpperCase()+modo.slice(1)).classList.add('on');
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('panel-' + tab).classList.add('active');
+}
 
-  if(modo === 'desktop'){
-    vp.style.padding = '0';
-    frame.style.width  = '100%';
-    frame.style.height = '100%';
-    frame.style.boxShadow = 'none';
-    frame.style.borderRadius = '0';
-  } else {
-    vp.style.padding = '24px';
-    frame.style.width  = s.width;
-    frame.style.height = s.height;
-    frame.style.boxShadow = s.shadow;
-    frame.style.borderRadius = '8px';
-    frame.style.flex = 'none';
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
   }
 }
 
-function recarregarVitrine(){
-  const fr = document.getElementById('vitrineFrame');
-  fr.src = fr.src;
+function addMsg(role, text) {
+  const box = document.getElementById('chatBox');
+  const div = document.createElement('div');
+  div.className = 'msg ' + (role === 'user' ? 'user' : 'jarves');
+  div.innerHTML = `
+    <div class="msg-label">${role === 'user' ? 'VOCÊ' : 'J.A.R.V.E.S.'}</div>
+    <div class="msg-bubble">${text.replace(/\n/g, '<br>')}</div>
+  `;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
 }
 
-function abrirVitrine(){
-  window.open('segunda-pele-vitrine.html','_blank');
+function showTyping() {
+  const box = document.getElementById('chatBox');
+  const div = document.createElement('div');
+  div.id = 'typingIndicator';
+  div.className = 'msg jarves';
+  div.innerHTML = `<div class="msg-label">J.A.R.V.E.S.</div><div class="typing"><span></span><span></span><span></span></div>`;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
 }
 
-/* ─────── TAGS TOGGLE ─────── */
-document.querySelectorAll('.tag-toggle').forEach(t=>{
-  t.addEventListener('click',()=>t.classList.toggle('on'));
-});
-
-/* ─────── CONFIG VAGAS ─────── */
-const cfgVagasEl = document.getElementById('cfgVagas');
-if(cfgVagasEl){
-  cfgVagasEl.addEventListener('input',()=>{
-    const v = cfgVagasEl.value;
-    document.getElementById('vagasNum').textContent = v;
-    document.getElementById('vagasBadge').textContent = v+' VAGAS';
-  });
-}
-function salvarConfig(){
-  const v = document.getElementById('cfgVagas').value;
-  document.getElementById('vagasNum').textContent = v;
-  document.getElementById('vagasBadge').textContent = v+' VAGAS';
-  alert('Configuração salva. Recarregue a vitrine para aplicar.');
+function removeTyping() {
+  const t = document.getElementById('typingIndicator');
+  if (t) t.remove();
 }
 
-/* ─────── ENGINE DE SCRIPTS ─────── */
-const ANTHROPIC_API_KEY='sk-ant-sk-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'; 
-SYSTEM_ENGINE = `Você é o motor criativo da Segunda Pele — joalheria artesanal de ouro 18K, São Paulo, fundada em 2009 por Sadraque Melo.
+let chatHistory = [];
 
-MISSÃO: Gerar scripts de conteúdo para Instagram/TikTok com a narrativa "Luxo Silencioso".
+async function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const btn = document.getElementById('sendBtn');
+  const text = input.value.trim();
+  if (!text) return;
 
-PRINCÍPIO CENTRAL: O conteúdo NÃO mostra produtos. Ele instala uma postura, uma identidade, um estado de espírito. "A postura de quem usa ouro maciço" é mais poderoso do que "veja este anel."
-
-BENCHMARK validado (use como referência de tom):
-"Você sabe o peso. Você sabe o quilate. Você sabe quem fez. Isso é luxo real."
-
-REGRAS DE CRIAÇÃO:
-- Nunca mencionar preço
-- Nunca usar palavras: promoção, desconto, oferta, barato, acessível
-- Sempre: escassez real (12 peças/mês), artesão nomeado, ouro 18K certificado
-- Tom: silêncio elegante, presença, não ostentação
-- Call to action: sempre RESERVA (nunca "compre", nunca "clique no link")
-- Frases curtas. Ritmo cinematográfico. Pausas têm peso.
-
-FORMATOS:
-- Reel/TikTok: inclua [CENA], [VOZ], [LEGENDA] e [CTA FINAL]
-- Story sequência: numere cada frame com o visual e o texto
-- Legenda de foto: parágrafo único, sem hashtags genéricas, máximo 5 hashtags ultra-nicho
-- Carrossel: numere cada slide com título e texto
-- Hook 3s: apenas as primeiras palavras que param o scroll`;
-
-let scriptsCount = 0;
-let ultimoScript = '';
-const scriptsSalvos = [];
-
-// scripts pré-definidos na biblioteca
-const SCRIPTS_PRESET = [
-  {titulo:'O Peso do Silêncio', conteudo:`[REEL · 45s · "O Peso do Silêncio"]
-
-[CENA 1 · 0-3s]
-Close extremo numa mão feminina. Anel de ouro. Sem rosto. Sem contexto.
-[VOZ]: "Você sabe o que é sentir o peso do que é real?"
-
-[CENA 2 · 3-12s]  
-Mãos do artesão trabalhando o metal. Movimento lento. Sem música alta — só o som do ouro.
-[VOZ]: "17 anos. O mesmo homem. O mesmo ouro. Cada peça numerada antes mesmo de ter um dono."
-
-[CENA 3 · 12-25s]
-A peça pronta, em luz natural. Sem fundo branco. Sem estúdio.
-[VOZ]: "Não é sobre ter uma joia. É sobre saber o que você carrega."
-
-[CENA 4 · 25-40s]
-Mulher, de costas, saindo. A peça visível por um segundo.
-[VOZ]: "12 peças. Por mês. Apenas."
-
-[CTA FINAL · 40-45s]
-Tela preta. Texto: RESERVA — para quem já sabe.
-[LEGENDA]: "Para qual momento da sua vida estamos forjando sua próxima Segunda Pele?"
-
-#segundapele #ouromassico #joia18k #luxosilencioso #joalheriaartesanal`},
-  {titulo:'17 Anos, Uma Peça', conteudo:`[STORY SEQUÊNCIA · 5 frames]
-
-[FRAME 1]
-Visual: Foto em preto e branco. Mãos do artesão jovem, 2009.
-Texto: "2009. O primeiro forno. A primeira chama."
-
-[FRAME 2]
-Visual: Mesmas mãos, hoje. Close no anel sendo polido.
-Texto: "17 anos depois. O mesmo ritual."
-
-[FRAME 3]
-Visual: Linha de 12 peças numeradas.
-Texto: "12 por mês. Nunca mais. Nunca menos."
-
-[FRAME 4]
-Visual: Certificado com número e assinatura à mão.
-Texto: "Cada uma sai com nome, número e história."
-
-[FRAME 5]
-Visual: Peça no pulso. Nada mais visível.
-Texto: "Esse é o trabalho da minha vida. Não tenho pressa para ele."
-CTA: RESERVA nos stories`},
-  {titulo:'Você Sabe o Quilate', conteudo:`[LEGENDA DE FOTO]
-
-Você sabe o peso. Você sabe o quilate. Você sabe quem fez.
-
-Não é sobre usar uma joia. É sobre saber o que você carrega.
-
-Ouro 18K. Feito à mão. Numerado. Certificado.
-Desde 2009, o mesmo artesão. As mesmas mãos. O mesmo rigor.
-
-12 peças por mês.
-Quem sabe, sabe.
-
-Digite RESERVA para saber se ainda há vaga no ciclo atual.
-
-#segundapele #ouromassico #joia18k #joalheriadigital #luxoreal`},
-  {titulo:'12 Peças. Apenas.', conteudo:`[HOOK DE ABERTURA · 3 SEGUNDOS]
-
-Opção A (voz):
-"12 peças. Por mês. Depois disso, você espera."
-
-Opção B (texto em tela):
-12.
-Apenas 12.
-Por mês.
-
-Opção C (cinematográfico):
-[Contagem regressiva visual: 12 → 11 → 10]
-Cada número some. A última peça fica.
-[CORTE]`}
-];
-
-function carregarScript(idx){
-  trocarPanel('engine', document.querySelector('.nav-item:nth-child(5)'));
-  const s = SCRIPTS_PRESET[idx];
-  mostrarOutput(s.conteudo, s.titulo);
-}
-
-async function gerarScript(){
-  const fmt = document.getElementById('formato').value;
-  const ang = document.getElementById('angulo').value;
-  const ctx = document.getElementById('contexto').value;
-  const tags = [...document.querySelectorAll('.tag-toggle.on')].map(t=>t.dataset.v).join(', ');
-
-  const btn = document.getElementById('btnGerar');
+  input.value = '';
   btn.disabled = true;
-  btn.textContent = '⟳ Gerando...';
+  addMsg('user', text);
 
-  const prompt = `Gere um script de ${fmt} para a Segunda Pele com:
-- Ângulo narrativo: "${ang}"
-- Princípios psicológicos ativos: ${tags}
-${ctx ? `- Contexto adicional: ${ctx}` : ''}
+  chatHistory.push({ role: 'user', content: text });
+  showTyping();
 
-Siga rigorosamente o formato correto para ${fmt}. Use o benchmark de tom como referência.`;
-
-  const out = document.getElementById('outputContent');
-  out.classList.remove('vazio');
-  out.innerHTML = '<span class="cursor-stream"></span>';
-
-  try{
-    const res = await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':ANTHROPIC_API_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body: JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:1000,
-        system: SYSTEM_ENGINE,
-        messages:[{role:'user',content:prompt}]
-      })
+  try {
+    // Apontamento direto para o seu servidor back-end na Vercel
+    const res = await fetch('https://jarves-gilt.vercel.app/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            model: 'llama-3.3-70b-versatile',
+            max_tokens: 1000,
+            system: SYSTEM_PROMPTS[currentMode],
+            messages: chatHistory
+        })
     });
+     
+
     const data = await res.json();
-    const txt = data.content?.[0]?.text || 'Erro na geração.';
-    ultimoScript = txt;
-    mostrarOutput(txt, `${fmt.toUpperCase()} · ${ang.substring(0,30)}...`);
-    scriptsCount++;
-    document.getElementById('scriptsCount').textContent = scriptsCount;
-    const p = Math.min(scriptsCount*20, 100);
-    document.getElementById('scriptProgress').style.width = p+'%';
-  }catch(e){
-    out.textContent = 'Erro de conexão. Verifique a API key e tente novamente.';
+    removeTyping();
+
+    if (data.content && data.content[0]) {
+      const reply = data.content[0].text;
+      chatHistory.push({ role: 'assistant', content: reply });
+      addMsg('jarves', reply);
+    } else {
+      addMsg('jarves', 'Erro na resposta. Verifique a chave API.');
+    }
+  } catch (e) {
+    removeTyping();
+    addMsg('jarves', 'Erro na conexão. Tente novamente.');
   }
 
   btn.disabled = false;
-  btn.textContent = '⚡ Gerar Script Agora';
 }
 
-function mostrarOutput(txt, label){
-  const out = document.getElementById('outputContent');
-  const lbl = document.getElementById('outputLabel');
-  out.classList.remove('vazio');
-  out.textContent = txt;
-  ultimoScript = txt;
-  if(label) lbl.textContent = label;
-}
+async function generateScript(type) {
+  const overlay = document.getElementById('loadingOverlay');
+  overlay.classList.add('active');
 
-function copiarScript(){
-  if(!ultimoScript){ alert('Gere um script primeiro.'); return; }
-  navigator.clipboard.writeText(ultimoScript).then(()=>alert('Script copiado!'));
-}
+  try {
+    const res = await fetch('https://jarves-gilt.vercel.app/api/chat', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    model: 'llama-3.3-70b-versatile',
+    max_tokens: 1000,
+    messages: [
+      {role:'system',content: SYSTEM_PROMPTS.vendas},
+    {role: 'user', content: SCRIPT_PROMPTS[type]}
+    ]
+  })
+})
 
-function salvarScript(){
-  if(!ultimoScript){ alert('Gere um script primeiro.'); return; }
-  scriptsSalvos.push({titulo:'Script '+(scriptsSalvos.length+1), conteudo:ultimoScript});
-  const container = document.getElementById('scriptsGravados');
-  const div = document.createElement('div');
-  div.className = 'script-item';
-  div.innerHTML = `<div class="script-info"><div class="script-titulo">Script Gerado #${scriptsSalvos.length}</div><div class="script-meta">SALVO MANUALMENTE</div></div><span class="script-badge badge-reel">SALVO</span>`;
-  div.onclick = ()=>{ mostrarOutput(ultimoScript,'Script Salvo'); trocarPanel('engine',document.querySelector('.nav-item.ativo')); };
-  container.appendChild(div);
-  alert('Script salvo na biblioteca!');
-}
+    const data = await res.json();
+    overlay.classList.remove('active');
+    console.log('RESPOSTA:',JSON.stringify(data));
 
-/* ─────── SIMULADOR WHATSAPP ─────── */
-const SYSTEM_BARBARA = `Você é Bárbara, consultora WhatsApp da Segunda Pele — joalheria de ouro 18K artesanal, São Paulo, 2009.
-
-Tom: sofisticado, caloroso, nunca apressado. Máximo 2 parágrafos curtos.
-
-REGRAS:
-- Se perguntarem preço: "O valor é discutido em consultoria — ele carrega mais do que um número."
-- Nunca desconto — alternativa: parcelamento
-- Escassez: "Temos 4 vagas neste ciclo"
-- Se "RESERVA": ative o fluxo imediatamente com entusiasmo contido
-- Convide para WhatsApp privado, nunca compartilhe número publicamente
-- Identifique intenção: CURIOSIDADE / INTERESSE / ALTA INTENÇÃO`;
-
-let histWA = [];
-
-async function enviarWA(){
-  const inp = document.getElementById('waInput');
-  const txt = inp.value.trim();
-  if(!txt) return;
-  inp.value='';
-  addWAMsg(txt,'usr');
-  histWA.push({role:'user',content:txt});
-  analisarConversa(txt);
-
-  try{
-    const r = await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:400,
-        system: SYSTEM_BARBARA,
-        messages: histWA
-      })
-    });
-    const d = await r.json();
-    const resp = d.content?.[0]?.text || 'Um momento, por favor...';
-    histWA.push({role:'assistant',content:resp});
-    addWAMsg(resp,'ia');
-  }catch(e){
-    addWAMsg('Problema de conexão. Tente novamente.','ia');
+    if (data.content && data.content[0]) {
+      const text = data.content[0].text;
+      document.getElementById('scriptText').innerText = text;
+      const out = document.getElementById('scriptOutput');
+      out.classList.add('visible');
+      out.scrollIntoView({ behavior: 'smooth' });
+    }
+  } catch (e) {
+    overlay.classList.remove('active');
+    console.error('JARVES ERROR:',e);
+    alert('Erro de conexão com Groq.Detalhes:'+ e.message);
   }
 }
 
-function simularLeadMsg(txt){
-  document.getElementById('waInput').value = txt;
-  enviarWA();
+function copyOutput() {
+  const text = document.getElementById('scriptText').innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = 'COPIADO';
+    setTimeout(() => btn.textContent = 'COPIAR', 2000);
+  });
 }
-
-function addWAMsg(txt, tipo){
-  const msgs = document.getElementById('waMsgs');
-  const div = document.createElement('div');
-  div.className = `wa-balao wa-${tipo}`;
-  div.style.animation = 'slideIn .3s ease forwards';
-  const hora = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-  div.innerHTML = txt.replace(/\n/g,'<br>')+`<div class="wa-hora">${hora}</div>`;
-  msgs.appendChild(div);
-  msgs.scrollTop = msgs.scrollHeight;
-}
-
-function analisarConversa(txt){
-  const t = txt.toLowerCase();
-  let intencao='CURIOSIDADE', etapa='RECEPÇÃO', score='30%';
-  if(t.includes('quanto') || t.includes('preço') || t.includes('valor')){
-    intencao='INTERESSE'; etapa='QUALIFICAÇÃO'; score='55%';
-  }
-  if(t.includes('reserva') || t.includes('quero') || t.includes('presente')){
-    intencao='ALTA INTENÇÃO'; etapa='CURADORIA'; score='80%';
-  }
-  if(t.includes('desconto')){
-    intencao='SENSÍVEL A PREÇO'; etapa='QUALIFICAÇÃO'; score='40%';
-  }
-  document.getElementById('intencaoLabel').textContent = intencao;
-  document.getElementById('etapaLabel').textContent = etapa;
-  document.getElementById('scoreLabel').textContent = score;
-}
-
-document.getElementById('waInput').addEventListener('keydown',e=>{if(e.key==='Enter')enviarWA();});
-document.getElementById('inputChat') && document.getElementById('inputChat').addEventListener('keydown',e=>{if(e.key==='Enter')enviarWA();});
 </script>
+
 </body>
 </html>
