@@ -17,7 +17,7 @@ export default async function handler(req, res) {
       descricao_integra: "Obra-prima esculpida em Ouro 18k legítimo e certificado. Elos soldados individualmente com simetria milimétrica, caimento impecável e acabamento em polimento espelhado de alta joalheria. Equipada com fecho gaveta exclusivo com trava dupla de segurança de alta pressão.",
       posicionamento: "Design minimalista e de presença magnética, desenvolvido para se fundir ao corpo como uma segunda pele e atravessar gerações.",
       disponibilidade: "Apenas 1 exemplar físico disponível em estoque para pronta-entrega imediata.",
-      cta_whatsapp: "https://wa.me/55_SEU_NUMERO_AQUI?text=Quero%20dar%20andamento%20na%20aquisição%20da%20Grumet%20SP-GRUMET18K"
+      cta_whatsapp: "https://wa.me/5511945587537?text=Quero%20dar%20andamento%20na%20aquisição%20da%20Grumet%20SP-GRUMET18K"
     }
     // As próximas 11 peças entram aqui seguindo o mesmo padrão exato de chaves
   ];
