@@ -1,13 +1,10 @@
 {
-
-"functions":{
-"api/chat.js":{
-"memory":1024,
-"maxDuration":30
-}
-},
-"routes":[
-{"src":"/","dest":"/index.html"}
+"version": 2,
+"cleanUrls": true
+"cleanUrls": true, 
+"rewrites": [
+{ "src": "/api/(.*)", "dest": "/api/$" }
+{ "src": "/((?!api/).*)", "dest": "/index.html"}
 ]
-
 }
+
