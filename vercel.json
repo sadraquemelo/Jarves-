@@ -1,8 +1,13 @@
 {
-  "functions": {
-    "api/chat.js": {
-      "memory": 1024,
-      "maxDuration": 30
-    }
-  }
+
+"functions":{
+"api/chat.js":{
+"memory":1024,
+"maxDuration":30
+}
+},
+"routes":[
+{"src":"/","dest":"/index.html"}
+]
+
 }
