@@ -1,10 +1,8 @@
 {
-"version": 2,
-"cleanUrls": true
-"cleanUrls": true, 
-"rewrites": [
-{ "src": "/api/(.*)", "dest": "/api/$" }
-{ "src": "/((?!api/).*)", "dest": "/index.html"}
-]
+  "version": 2,
+  "cleanUrls": true,
+  "rewrites": [
+    { "src": "/api/:path*", "dest": "/api/:path*" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
 }
-
