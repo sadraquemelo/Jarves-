@@ -749,7 +749,7 @@ function setMode(btn, mode) {
   currentMode = mode;
 }
 
-<div id="panel-comando"(tab) {
+function switchTab(tab) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   event.target.classList.add('active');
