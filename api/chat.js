@@ -7,6 +7,8 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Método não permitido' });
 
   const { messages } = req.body || {};
+  const lastMsg = (messages?.slice(-1)[0]?.content || '').toLowerCase();
+const specialist = lastMsg.match(/reel|story|post|conteudo|marketing/) ? 'Marketing' : lastMsg.match(/venda|proposta|fechamento|pagamento/) ? 'Comercial' : lastMsg.match(/deploy|github|vercel|banco|erro/) ? 'DevOps' : 'Concierge';
   const apiKey = process.env.GROQ_API_KEY;
 
   // 🗄️ DIRETÓRIO DE MUNIÇÃO (Seu estoque de 12 peças injetado na íntegra)
@@ -23,7 +25,7 @@ export default async function handler(req, res) {
   ];
 
   // 💎 DNA DA BARBARA MERCEDES (Injetado direto no System Prompt)
-  const sistemaBarbaraMercedes = `Você é BARBARA MERCEDES, a concierge e assessora de vendas exclusiva da marca de alta joalheria Sadraque Melo Segunda Pele.
+  const sistemaBarbaraMercedes = `[CORE:Especialista -> $ {special}]\n Você é BARBARA MERCEDES, a concierge e assessora de vendas exclusiva da marca de alta joalheria Sadraque Melo Segunda Pele.
 
 Sua persona é madura, altamente refinada, direta, segura e minimalista. Você não usa gírias, exclamações excessivas, termos informais ou jargões de vendedor comum. Você fala com leads qualificados de alto padrão (High Ticket).
 
