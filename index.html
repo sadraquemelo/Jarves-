@@ -906,6 +906,15 @@ function copyOutput() {
       </div>
     </div>
 </div>
-
+<script>
+fetch('/api/core',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:'status'})})
+.then(r=>{
+  document.getElementById('v-status').textContent=r.ok?'ONLINE ✓':'ERRO';
+  document.getElementById('c-status').textContent=r.ok?'ONLINE ✓':'ERRO';
+}).catch(()=>{
+  document.getElementById('v-status').textContent='OFFLINE ✗';
+  document.getElementById('c-status').textContent='OFFLINE ✗';
+});
+</script>
 </body>
 </html>
