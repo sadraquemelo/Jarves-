@@ -906,6 +906,15 @@ function copyOutput() {
       </div>
     </div>
 </div>
+  <div style="background:#181818; padding:1.5rem; border:1px solid #C9A84C33; margin-top:1rem; grid-column:1/-1;">
+  <div style="color:#C9A84C; font-size:.7rem; letter-spacing:.1em;">COMERCIAL</div>
+  <div style="display:flex; gap:2rem; margin-top:.5rem; flex-wrap:wrap;">
+    <span>👤 Leads hoje: <strong id="leads-hoje">0</strong></span>
+    <span>📋 Propostas: <strong id="propostas">0</strong></span>
+    <span>✅ Fechamentos: <strong id="fechamentos">0</strong></span>
+    <span>💰 Valor semana: <strong id="valor-semana">R$ 0</strong></span>
+  </div>
+</div>
 <script>
 fetch('/api/core',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:'status'})})
 .then(r=>{
