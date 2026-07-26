@@ -926,6 +926,15 @@ function copyOutput() {
   </div>
 </div>
 <script>
+  <div style="background:#181818; padding:1.5rem; border:1px solid #C9A84C33; margin-top:1rem; grid-column:1/-1;">
+  <div style="color:#C9A84C; font-size:.7rem; letter-spacing:.1em;">INTELIGÊNCIA</div>
+  <div style="margin-top:.5rem;">
+    <div style="margin-bottom:.5rem;">🎯 <strong>Próxima ação:</strong> <span id="prox-acao">Publicar Story de escassez hoje às 19h</span></div>
+    <div style="margin-bottom:.5rem;">🔥 <strong>Lead mais quente:</strong> <span id="lead-quente">Aguardando dados do CRM</span></div>
+    <div style="margin-bottom:.5rem;">⚡ <strong>Alerta:</strong> <span id="alerta-sistema">Sistema operando normalmente</span></div>
+    <div>🔮 <strong>Insight:</strong> <span id="insight-dia">Ciclo atual com 4 vagas — urgência real disponível</span></div>
+  </div>
+</div>
 fetch('/api/core',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:'status'})})
 .then(r=>{
   document.getElementById('v-status').textContent=r.ok?'ONLINE ✓':'ERRO';
