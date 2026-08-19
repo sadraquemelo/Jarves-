@@ -11,26 +11,21 @@ module.exports = async (req, res) => {
   try {
     const hasDatabase = !!process.env.DATABASE_URL;
 
-    // Resposta estruturada para o Motor 24H - Segunda Pele
     return res.status(200).json({
       timestamp: new Date().toISOString(),
       motor: 'Segunda Pele 24H – ATIVO',
       database: hasDatabase ? 'conectado' : 'ausente',
       status: 'ONLINE',
-      leads_quentes: [
-        { id: 1, nome: 'Dra. Fernanda', telefone: 'pendente', score: 95, temperatura: 'quente' }
-      ],
-      pecas_disponiveis: [
-        { id: 1, nome: 'Anel Ouro Solitário Segunda Pele', valor: 4500.00, status_peca: 'disponivel' }
-      ],
+      leads_quentes: [],
+      pecas_disponiveis: [],
       receita_hoje: { 
-        total_vendas: 1, 
-        receita_dia: 4500.00 
+        total_vendas: 0, 
+        receita_dia: 0 
       }
     });
 
   } catch (error) {
-    console.error("Erro crítico no motor24h:", error.message);
+    console.error("Erro no motor24h:", error.message);
     
     return res.status(500).json({
       error: 'Internal Server Error',
