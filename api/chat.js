@@ -91,7 +91,7 @@ const { messages = [] } = body;
                      lastMsg.match(/deploy|github|vercel|banco|erro|api/) ? 'DevOps' : 'Concierge';
 
   const contextoMotor = await getContextoMotor();
-  const apiKey = process.env.GROQ_API_KEY;
+  const apiKey = process.env.ANTROPIC_API_KEY;
 
   const sistemaBarbaraMercedes = `[CORE: Especialista → ${specialist}]
 
@@ -121,26 +121,23 @@ FUNIL ARPÃO:
 Escreva de forma magnética e sofisticada. Você assessora a aquisição de um legado de valor.`;
 
   try {
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: 'llama-3.1-8b-instant',
-        max_tokens: 1024,
-        temperature: 0.3,
-        messages: [
-          { role: 'system', content: sistemaBarbaraMercedes },
-          ...messages
-        ]
-      })
-    });
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+  method: 'POST',
+  headers: {
+    'x-api-key': apiKey,
+    'anthropic-version': '2023-06-01',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    model: 'claude-haiku-4-5-20251001',
+    max_tokens: 1024,
+    system: sistemaBarbaraMercedes,
+    messages: messages
+  })
+});
 
-    const data = await response.json();
-    console.log('[GROQ RESPONSE]', JSON.stringify(data));
-const text = data.choices?.[0]?.message?.content || data.error?.message || JSON.stringify(data);
+const data = await response.json();
+const text = data.content?.[0]?.text || data.error?.message || JSON.stringify(data);
     return res.status(200).json({ content: [{ text }] });
 
   } catch (error) {
