@@ -139,7 +139,8 @@ Escreva de forma magnética e sofisticada. Você assessora a aquisição de um l
     });
 
     const data = await response.json();
-    const text = data.choices?.[0]?.message?.content || '';
+    console.log('[GROQ RESPONSE]', JSON.stringify(data));
+const text = data.choices?.[0]?.message?.content || data.error?.message || JSON.stringify(data);
     return res.status(200).json({ content: [{ text }] });
 
   } catch (error) {
