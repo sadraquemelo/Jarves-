@@ -82,7 +82,8 @@ module.exports = async (req, res) => {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Método não permitido' });
 
-  const { messages } = req.body || {};
+  const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body || {};
+const { messages = [] } = body;
   const lastMsg = (messages?.slice(-1)[0]?.content || '').toLowerCase();
 
   const specialist = lastMsg.match(/reel|story|post|conteudo|marketing|instagram/) ? 'Marketing' :
