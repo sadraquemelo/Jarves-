@@ -128,7 +128,7 @@ Escreva de forma magnética e sofisticada. Você assessora a aquisição de um l
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'llama3-70b-8192',
+        model: 'llama-3.3-70b-versatile',
         max_tokens: 1024,
         temperature: 0.3,
         messages: [
