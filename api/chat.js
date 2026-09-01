@@ -91,7 +91,7 @@ const { messages = [] } = body;
                      lastMsg.match(/deploy|github|vercel|banco|erro|api/) ? 'DevOps' : 'Concierge';
 
   const contextoMotor = await getContextoMotor();
-  const apiKey = process.env.ANTROPIC_API_KEY;
+  const apiKey = process.env.ANTHROPIC_API_KEY;
 
   const sistemaBarbaraMercedes = `[CORE: Especialista → ${specialist}]
 
