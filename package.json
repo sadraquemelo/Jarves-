@@ -1,1 +1,1 @@
-{"name":"jarves",version:"1.0.0","dependencies":{"pg":"^8.11.0"}}
+{"name":"jarves","version":"1.0.0","dependencies":{"@anthropic-ai/sdk":"^0.125.0","pg":"^8.11.0"}} 
