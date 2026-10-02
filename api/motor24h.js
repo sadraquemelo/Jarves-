@@ -1,4 +1,4 @@
-const { neon } = require('@neondatabase/serverless');
+const { Pool } = require('pg');
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -18,13 +18,18 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    const sql = neon(databaseUrl);
-    const result = await sql`SELECT NOW() as server_time;`;
+    const pool = new Pool({
+      connectionString: databaseUrl,
+      ssl: { rejectUnauthorized: false }
+    });
+
+    const result = await pool.query('SELECT NOW() as server_time;');
+    await pool.end();
 
     return res.status(200).json({
       status: 'online',
       motor: 'Motor 24H Jarves Core',
-      timestamp: result[0].server_time
+      timestamp: result.rows[0].server_time
     });
   } catch (error) {
     return res.status(500).json({
